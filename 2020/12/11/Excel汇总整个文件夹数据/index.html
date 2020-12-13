@@ -13,34 +13,34 @@
 <meta property="og:site_name" content="折腾手记">
 <meta property="og:description" content="背景年初写了一个用EXCEL汇总一个EXCEL中的多张表的数据，现在记录一下使用EXCEL汇总一个文件夹下多个相同结构的文件。仍然使用PowerQuery（PQ ）。">
 <meta property="og:locale">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-23-47.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-26-19.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-45-31.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-48-06.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-48-36.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-49-13.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-54-00.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-55-10.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-57-04.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-11-41.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-12-34.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-12-56.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-13-41.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-17-28.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-54-21.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-55-49.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-56-17.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-56-42.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-57-28.png">
-<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-58-49.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-23-47.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-26-19.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-45-31.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-48-06.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-48-36.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-49-13.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-54-00.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-55-10.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-57-04.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-11-41.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-12-34.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-12-56.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-13-41.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-17-28.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-54-21.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-55-49.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-56-17.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-56-42.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-57-28.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-58-49.png">
 <meta property="article:published_time" content="2020-12-11T07:08:00.000Z">
-<meta property="article:modified_time" content="2020-12-13T07:33:07.325Z">
+<meta property="article:modified_time" content="2020-12-13T09:34:37.702Z">
 <meta property="article:author" content="lyallchan">
 <meta property="article:tag" content="PowerQuery">
 <meta property="article:tag" content="Excel">
 <meta property="article:tag" content="文件夹">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-23-47.png">
+<meta name="twitter:image" content="http://lyallchan.github.io/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-23-47.png">
   
     <link rel="alternate" href="/atom.xml" title="折腾手记" type="application/atom+xml">
   
@@ -126,49 +126,49 @@
         <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>年初写了一个用EXCEL汇总一个EXCEL中的多张表的数据，现在记录一下使用EXCEL汇总一个文件夹下多个相同结构的文件。仍然使用PowerQuery（PQ ）。  </p>
 <a id="more"></a>
 
-<h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><p>在Excel中，数据选项卡，选择导入文件夹中文件的相关数据，如下图：<br><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-23-47.png"></p>
+<h1 id="过程"><a href="#过程" class="headerlink" title="过程"></a>过程</h1><p>在Excel中，数据选项卡，选择导入文件夹中文件的相关数据，如下图：<br><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-23-47.png"></p>
 <p>选择文件夹路径后，系统将读到的文件信息形成一张表，如下图，这里的数据是一年汇总数据，每个月一个Excel文件，每个Excel文件中，每天一张Sheet，要汇总365张Sheet。在这个界面上选择转换数据，得到一个文件夹下所有文件信息的表</p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-26-19.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-26-19.png"></p>
 <p>这张表我们感兴趣的是Content列，这列包含了所有的数据信息，右键选择该列，将其它列删除。</p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-45-31.png"></p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-48-06.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-45-31.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-48-06.png"></p>
 <p>选择Content列右上角的深化按钮，进行合并文件</p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-48-36.png"></p>
-<p>在合并文件对话框中，直接点击确定，系统将按照模板把所有数据合并在一张表中<br><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-49-13.png"></p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-54-00.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-48-36.png"></p>
+<p>在合并文件对话框中，直接点击确定，系统将按照模板把所有数据合并在一张表中<br><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-49-13.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-54-00.png"></p>
 <p>上图中，可以看出，右边的应用步骤中，增加了很多默认的步骤，这些步骤有些多余，我们后面还会讲到。</p>
 <p>我们感兴趣的是Name和Data列，Name是Sheet名，原来文件使用日期名做为Sheet名称，所以这一列是我们需要的日期信息，Data列包含了每张Sheet的数据信息。选择这两列，将其它列删除。</p>
 <p>选择Data列右上角的深化按钮，进一步导入所需要数据。</p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-55-10.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-55-10.png"></p>
 <p>这个对话框选择所需要的列，根据实际需要，我们选择列1，2，3，5，7，9，100，102，104共9列。</p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-57-04.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-15-57-04.png"></p>
 <p>系统将这9列导入当前表，如上图。</p>
 <p>接下来就是数据整理和清洗，这一步需要结合业务需求，具体来做:一般方法就是删除最前面或者最后面的行，这些行通常是标题或者汇总数据，通过筛选选择需要数据，删除多余的列。这里不再一一描述。</p>
 <p>数据整理和清洗需要耐心细致，反复尝试，整个汇总过程最长的就是这一步。</p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-11-41.png"></p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-12-34.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-11-41.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-12-34.png"></p>
 <p>数据清洗完成之后，得到一个干净的，我们想到的数据。</p>
 <p>接下来就是更改数据类型，导入的数据默认都是文本类型，可以根据需要改成日期类型、整数类型和小数类型。</p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-12-56.png"></p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-13-41.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-12-56.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-13-41.png"></p>
 <p>还可以添加计算列。</p>
 <blockquote>
 <p>根据我的经验，如果后续做数据透视表的时候需要计算平均值，那添加的计算列避免乘除运算，只做简单的加减运算。更复杂的公式可以在数据透视表的时候制作。</p>
 </blockquote>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-17-28.png"></p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-54-21.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-11-16-17-28.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-54-21.png"></p>
 <p>至此，完成了数据导入汇总。</p>
 <p>===================================================</p>
 <p>进一步优化。</p>
 <p>如前所述，根据默认值导入的数据有多余的步骤和不必要的参数，可以进一步优化。</p>
 <p>回到第二步，即只有Content那一步，将之后的步骤全部删除，添加一个计算列，取出Content列的内容。</p>
 <p>如下图：列名可以为<code>Cutstom</code>，公式为<code>=each Excel.Workbook([Content])</code>，注意大小写，PQ的M语言区分大小写。</p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-55-49.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-55-49.png"></p>
 <p>将Custom列展开，再将展开的Custom.Data列展开，就得到想要的数据。</p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-56-17.png"></p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-56-42.png"></p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-57-28.png"></p>
-<p><img src="Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-58-49.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-56-17.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-56-42.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-57-28.png"></p>
+<p><img src="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/2020-12-12-14-58-49.png"></p>
 
       
     </div>
