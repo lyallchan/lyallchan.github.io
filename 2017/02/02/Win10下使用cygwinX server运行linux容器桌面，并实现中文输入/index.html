@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Win10下使用cygwinX server运行linux容器桌面，并实现中文输入 | 折腾手记</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Win10安装Docker for windows，一般在docker中运行命令行程序。如果要在容器内运行桌面程序，那如何配置呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Win10下使用cygwinX server运行linux容器桌面，并实现中文输入">
+<meta property="og:url" content="http://lyallchan.github.io/2017/02/02/Win10%E4%B8%8B%E4%BD%BF%E7%94%A8cygwinX%20server%E8%BF%90%E8%A1%8Clinux%E5%AE%B9%E5%99%A8%E6%A1%8C%E9%9D%A2%EF%BC%8C%E5%B9%B6%E5%AE%9E%E7%8E%B0%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="Win10安装Docker for windows，一般在docker中运行命令行程序。如果要在容器内运行桌面程序，那如何配置呢？">
+<meta property="og:locale">
+<meta property="article:published_time" content="2017-02-02T05:17:05.000Z">
+<meta property="article:modified_time" content="2017-02-02T05:18:34.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="docker">
+<meta property="article:tag" content="desktop">
+<meta property="article:tag" content="中文输入">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="折腾手记" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">折腾手记</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">运维！！运维！！</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Suche"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Suche"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://lyallchan.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-Win10下使用cygwinX server运行linux容器桌面，并实现中文输入" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2017/02/02/Win10%E4%B8%8B%E4%BD%BF%E7%94%A8cygwinX%20server%E8%BF%90%E8%A1%8Clinux%E5%AE%B9%E5%99%A8%E6%A1%8C%E9%9D%A2%EF%BC%8C%E5%B9%B6%E5%AE%9E%E7%8E%B0%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/" class="article-date">
+  <time class="dt-published" datetime="2017-02-02T05:17:05.000Z" itemprop="datePublished">2017-02-02</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Win10下使用cygwinX server运行linux容器桌面，并实现中文输入
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>Win10安装Docker for windows，一般在docker中运行命令行程序。如果要在容器内运行桌面程序，那如何配置呢？</p>
+<a id="more"></a>
+
+<p><a href="hub.docker.com">hub.docker.com</a>上搜索了一下，大多数在容器内安装桌面环境以及VNC Server或者Xpra，然后在Windows中安装VNC客户端或者Xpra，连接到容器，实现容器的桌面应用。</p>
+<p>实际上也可以使用X11方案：在windows上运行Xserver，容器内运行Xclient。下面配置使用cygwinX实现windows的Xserver，容器内安装桌面程序，做为Xclient，连接至windows的X server。</p>
+<h1 id="安装cygwinX"><a href="#安装cygwinX" class="headerlink" title="安装cygwinX"></a>安装cygwinX</h1><p>运行cygwin的setup，选择xorg-server和xinit，一路next，完成安装。启动命令是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">startxwin</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://x.cygwin.com/">cygwinX</a>在1.7版本之后，因为安全原因，默认不再监听TCP端口，只监听socket端口。也就是只能运行本地X client，或者通过ssh运行远程的X client。</p>
+<p>也有<a target="_blank" rel="noopener" href="https://linux.cn/article-5579-1.html">资料</a>说明，mac上安装x server，容器运行时可以映射mac的/tmp/.X11-unix到容器内的/tmp/.X11-unix，实现容器内运行桌面环境，显示在mac的x server上。但是在cgywinX和docker for windows环境下，实验不成功。</p>
+<p>在容器内安装ssh server比较麻烦，这里就启用cygwinX的TCP功能，通过TCP连接容器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">startxwin -- -listen tcp</span><br><span class="line">xhost +  </span><br></pre></td></tr></table></figure>
+
+<p>启动xwin，并关闭xhost的access control，使得任意IP的x client都能连上xwin。</p>
+<p>startxwin默认启动xwin multiwindow模式，这样就在windows上启动了一个X server，默认的端口为:0.0</p>
+<h1 id="容器内运行单个GUI程序"><a href="#容器内运行单个GUI程序" class="headerlink" title="容器内运行单个GUI程序"></a>容器内运行单个GUI程序</h1><p>比如运行一个firefox。按照普通方法安装firefox，配置好中文字体。</p>
+<p>dockerfile</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">FROM ubuntu:16.04</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">RUN apt-get update &amp;&amp; apt-get -y install firefox</span><br><span class="line"></span><br><span class="line">RUN apt-get install -y language-pack-zh-hans</span><br><span class="line">RUN mkdir &#x2F;usr&#x2F;share&#x2F;fonts&#x2F;win</span><br><span class="line">ADD simsun.ttc &#x2F;usr&#x2F;share&#x2F;fonts&#x2F;win&#x2F;</span><br><span class="line">ADD simhei.ttf &#x2F;usr&#x2F;share&#x2F;fonts&#x2F;win&#x2F;</span><br><span class="line">RUN mkfontscale &amp;&amp; mkfontdir &amp;&amp; fc-cache -fv</span><br><span class="line"></span><br><span class="line">RUN apt-get autoclean &amp;&amp; apt-get autoremove</span><br></pre></td></tr></table></figure>
+
+<p>运行的时候，指定DISPLAY环境变量到windows的X server端口。即</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line">    -e DISPLAY&#x3D;10.0.75.1:0.0 \</span><br><span class="line">    --rm \</span><br><span class="line">    -it \</span><br><span class="line">    --name firefox \</span><br><span class="line">    --hostname firefox \</span><br><span class="line">    firefox:latest \</span><br><span class="line">    firefox</span><br></pre></td></tr></table></figure>
+
+<p>10.0.75.1是windows的一个IP地址，是docker的网桥网关。</p>
+<p>这种方法的优点在于不需要在容器内安装桌面，只要安装应用程序，桌面管理由cygwinX完成，生成的镜像小，配置简单。</p>
+<p>运行的时候，firefox好像是本地windows的一个应用，有windows的标题栏等等，实际却在容器内运行。</p>
+<h1 id="运行容器内桌面，实现中文输入"><a href="#运行容器内桌面，实现中文输入" class="headerlink" title="运行容器内桌面，实现中文输入"></a>运行容器内桌面，实现中文输入</h1><p>上面的运行方式有个问题，能显示中文，却无法输入中文。查了很多资料也找不到只安装GUI程序和输入法的情况下，正确的输入中文。</p>
+<p>那么尝试在容器内安装桌面环境。</p>
+<h2 id="修改startxwin"><a href="#修改startxwin" class="headerlink" title="修改startxwin"></a>修改startxwin</h2><p>xwin有<a target="_blank" rel="noopener" href="https://x.cygwin.com/docs/man1/XWin.1.html">三种运行模式</a>，singlewindow，multiwindow和rootless。</p>
+<ul>
+<li>singlewindow模式：xwin使用远程桌面管理器，管理所有的远程X应用，在本地只显示一个窗口</li>
+<li>multiwindow模式：xwin使用内置的桌面管理器，远程每个X应用都拥有一个独立窗口，好像是本地应用一样。上面的运行方式就是这个方式</li>
+<li>rootless模式：基本是singlewindow，不过在没有远程桌面连接时，隐藏xserver的root窗口，也就是不显示xserver的窗口。</li>
+</ul>
+<p>要在容器内运行桌面，需要使xwin运行在singlewindow或者rootless模式，需要修改startxwin。multiwindow也可以运行，但是显示比较奇怪。</p>
+<p>startxwin是一个shell程序，很容易找到xwin的serverargs</p>
+<p>vi /usr/bin/startxwin</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># commeted by lyallchan, uncommet to return default behavier</span><br><span class="line"># serverargs&#x3D;&quot;-multiwindow $serverargs&quot;</span><br><span class="line">###</span><br><span class="line">serverargs&#x3D;&quot;-listen tcp -rootless $serverargs&quot;</span><br></pre></td></tr></table></figure>
+
+<p>startxwin默认启动xwin的multiwindow模式，修改startxwin，使得xwin监听TCP端口，运行在rootless模式。</p>
+<h2 id="容器内安装桌面和中文输入法"><a href="#容器内安装桌面和中文输入法" class="headerlink" title="容器内安装桌面和中文输入法"></a>容器内安装桌面和中文输入法</h2><p>选来选去，桌面安装xfce4，中文输入法安装fcitx和fcitx-pinyin。</p>
+<p>dockerfile</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">FROM ubuntu:16.04</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV DEBIAN_FRONTEND noninteractive</span><br><span class="line">ENV GTK_IM_MODULE fcitx</span><br><span class="line">ENV QT_IM_MODULE fcitx</span><br><span class="line">ENV XMODIFIERS &quot;@im&#x3D;fcitx&quot;</span><br><span class="line">ENV LC_CTYPE zh_CN.UTF-8</span><br><span class="line"></span><br><span class="line">RUN apt-get update &amp;&amp; apt-get -y install firefox</span><br><span class="line"></span><br><span class="line">RUN apt-get install -y language-pack-zh-hans</span><br><span class="line">RUN mkdir &#x2F;usr&#x2F;share&#x2F;fonts&#x2F;win</span><br><span class="line">ADD simsun.ttc &#x2F;usr&#x2F;share&#x2F;fonts&#x2F;win&#x2F;</span><br><span class="line">ADD simhei.ttf &#x2F;usr&#x2F;share&#x2F;fonts&#x2F;win&#x2F;</span><br><span class="line">RUN mkfontscale &amp;&amp; mkfontdir &amp;&amp; fc-cache -fv</span><br><span class="line"></span><br><span class="line">RUN apt-get install -y xfce4 xfce4-terminal</span><br><span class="line">RUN apt-get install -y fcitx fcitx-pinyin</span><br><span class="line"></span><br><span class="line">RUN mkdir -p &#x2F;root&#x2F;.config&#x2F;fcitx</span><br><span class="line">RUN echo [Hotkey] &gt; &#x2F;root&#x2F;.config&#x2F;fcitx&#x2F;config</span><br><span class="line">RUN echo TriggerKey&#x3D;CTRL_ALT_SPACE &gt;&gt; &#x2F;root&#x2F;.config&#x2F;fcitx&#x2F;config</span><br><span class="line">RUN echo SwitchKey&#x3D;Disabled &gt;&gt; &#x2F;root&#x2F;.config&#x2F;fcitx&#x2F;config</span><br><span class="line">RUN echo IMSwitchKey&#x3D;False &gt;&gt; &#x2F;root&#x2F;.config&#x2F;fcitx&#x2F;config</span><br><span class="line"></span><br><span class="line">RUN apt-get autoclean &amp;&amp; apt-get autoremove</span><br></pre></td></tr></table></figure>
+
+<p>apt-get xfce4的时候，会和用户交互，导致build失败，要设置成noninteractive模式。</p>
+<p>安装好输入法之后，要设置3个<a target="_blank" rel="noopener" href="https://fcitx-im.org/wiki/Input_method_related_environment_variables">环境变量</a>，使系统默认启用fcitx输入框架。</p>
+<p>配置fcitx的输入法切换键为CTRL_ALT_SPACE，以避免和windows的输入法快捷键冲突。</p>
+<h2 id="运行容器"><a href="#运行容器" class="headerlink" title="运行容器"></a>运行容器</h2><p>运行比较复杂，写个脚本简化操作。</p>
+<p>判断xwin是否运行，如果不运行，在tmux中启动xwin，不在后台启动xwin，可以避免屏幕混乱。</p>
+<p>关闭xhost的access control，使得任意IP的x client都能连上xwin。</p>
+<p>启动容器，并启动fcitx和xfce4。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash </span><br><span class="line"></span><br><span class="line">D&#x3D;10.0.75.1:0.0</span><br><span class="line"></span><br><span class="line">if ! ps | grep xinit ; then</span><br><span class="line">    tmux new-session -d -s xwin startxwin</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">xhost + </span><br><span class="line"></span><br><span class="line">winpty \</span><br><span class="line">    docker  run \</span><br><span class="line">    -e DISPLAY&#x3D;$D \</span><br><span class="line">    --rm \</span><br><span class="line">    -it \</span><br><span class="line">    --name&#x3D;firefox \</span><br><span class="line">    --hostname&#x3D;firefox \</span><br><span class="line">    firefox:on \</span><br><span class="line">    bash -c &quot;fcitx; startxfce4&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><p>hub.docker.com上的桌面镜像</p>
+<p> <a target="_blank" rel="noopener" href="https://hub.docker.com/r/queeno/ubuntu-desktop/">https://hub.docker.com/r/queeno/ubuntu-desktop/</a><br> <a target="_blank" rel="noopener" href="https://hub.docker.com/r/rogaha/docker-desktop/">https://hub.docker.com/r/rogaha/docker-desktop/</a><br> <a target="_blank" rel="noopener" href="https://hub.docker.com/r/sevnew/ubuntu-xfce-vnc-desktop-chrome/">https://hub.docker.com/r/sevnew/ubuntu-xfce-vnc-desktop-chrome/</a></p>
+</li>
+<li><p>cygwinX1.7之后，不再监听TCP端口</p>
+<p> <a target="_blank" rel="noopener" href="https://x.cygwin.com/docs/faq/cygwin-x-faq.html#q-xserver-nolisten-tcp-default">https://x.cygwin.com/docs/faq/cygwin-x-faq.html#q-xserver-nolisten-tcp-default</a></p>
+</li>
+<li><p>MAC下运行桌面容器</p>
+<p> <a target="_blank" rel="noopener" href="https://linux.cn/article-5579-1.html">https://linux.cn/article-5579-1.html</a></p>
+</li>
+<li><p>ubuntu安装宋体</p>
+<p> <a target="_blank" rel="noopener" href="http://www.2cto.com/os/201308/239373.html">http://www.2cto.com/os/201308/239373.html</a></p>
+</li>
+<li><p>xwin的man文档，详细说明了xwin的三种运行模式</p>
+<p> <a target="_blank" rel="noopener" href="https://x.cygwin.com/docs/man1/XWin.1.html">https://x.cygwin.com/docs/man1/XWin.1.html</a></p>
+</li>
+<li><p>fcitx的环境变量设置</p>
+<p> <a target="_blank" rel="noopener" href="https://fcitx-im.org/wiki/Input_method_related_environment_variables">https://fcitx-im.org/wiki/Input_method_related_environment_variables</a><br> <a target="_blank" rel="noopener" href="https://wiki.archlinux.org/index.php/Fcitx">https://wiki.archlinux.org/index.php/Fcitx</a></p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://lyallchan.github.io/2017/02/02/Win10%E4%B8%8B%E4%BD%BF%E7%94%A8cygwinX%20server%E8%BF%90%E8%A1%8Clinux%E5%AE%B9%E5%99%A8%E6%A1%8C%E9%9D%A2%EF%BC%8C%E5%B9%B6%E5%AE%9E%E7%8E%B0%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/" data-id="ckimvnvp5000gpsu38ocoazg8" data-title="Win10下使用cygwinX server运行linux容器桌面，并实现中文输入" class="article-share-link">Teilen</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/desktop/" rel="tag">desktop</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/" rel="tag">中文输入</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/02/04/%E5%AE%B9%E5%99%A8%E5%8C%96Hbase%E5%92%8Csquirrel/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Neuer</strong>
+      <div class="article-nav-title">
+        
+          容器化Hbase standalone、Phoenix和Squirrel
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/01/17/%E5%BB%BA%E7%AB%8B%E4%BC%AA%E5%88%86%E5%B8%83%E5%BC%8Fhbase%E9%9B%86%E7%BE%A4/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">建立伪分布式hbase集群</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Anyoffice/" rel="tag">Anyoffice</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Caddy/" rel="tag">Caddy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Excel/" rel="tag">Excel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/GUI/" rel="tag">GUI</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Golang%EF%BC%8CTotal-Commander/" rel="tag">Golang，Total Commander</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JSON/" rel="tag">JSON</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Outlook/" rel="tag">Outlook</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/PowerQuery/" rel="tag">PowerQuery</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Powershell/" rel="tag">Powershell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/VIM/" rel="tag">VIM</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebDAV/" rel="tag">WebDAV</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/XML/" rel="tag">XML</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ahk/" rel="tag">ahk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/apache/" rel="tag">apache</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/autohotkey/" rel="tag">autohotkey</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/capslock/" rel="tag">capslock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/com/" rel="tag">com</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/conda/" rel="tag">conda</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/css/" rel="tag">css</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/cygwin/" rel="tag">cygwin</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/desktop/" rel="tag">desktop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dynalist/" rel="tag">dynalist</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/electron/" rel="tag">electron</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/epub/" rel="tag">epub</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/event/" rel="tag">event</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hadoop/" rel="tag">hadoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hbase/" rel="tag">hbase</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iso/" rel="tag">iso</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/junos/" rel="tag">junos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/jupyter/" rel="tag">jupyter</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/keepass/" rel="tag">keepass</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/load-balance/" rel="tag">load balance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mac/" rel="tag">mac</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/markdown/" rel="tag">markdown</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mesos/" rel="tag">mesos</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/monit/" rel="tag">monit</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nodejs/" rel="tag">nodejs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/opensuse/" rel="tag">opensuse</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/operator/" rel="tag">operator</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/proxy/" rel="tag">proxy</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/scoop/" rel="tag">scoop</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sendusingaccount/" rel="tag">sendusingaccount</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/spark/" rel="tag">spark</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/squirrel/" rel="tag">squirrel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tabular/" rel="tag">tabular</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tomcat/" rel="tag">tomcat</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/totalcmd/" rel="tag">totalcmd</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vagrant/" rel="tag">vagrant</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vim/" rel="tag">vim</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vmware/" rel="tag">vmware</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiki/" rel="tag">wiki</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/win10/" rel="tag">win10</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wiz/" rel="tag">wiz</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/zookeeper/" rel="tag">zookeeper</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/" rel="tag">中文输入</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%8F%91%E4%BB%B6%E7%AE%B1/" rel="tag">发件箱</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%91%8A%E8%AD%A6/" rel="tag">告警</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="tag">命令行</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%9B%BE%E7%89%87/" rel="tag">图片</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BE%AE%E4%BF%A1/" rel="tag">微信</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BF%AB%E6%8D%B7%E9%94%AE/" rel="tag">快捷键</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/" rel="tag">数据透视表</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%96%87%E4%BB%B6%E5%A4%B9/" rel="tag">文件夹</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%99%BB%E5%BD%95/" rel="tag">登录</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%99%BD%E7%BA%B8%E6%9C%8B%E5%8F%8B/" rel="tag">白纸朋友</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84/" rel="tag">相对路径</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AE%80%E7%B9%81/" rel="tag">简繁</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BC%96%E8%AF%91/" rel="tag">编译</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A2%AB%E5%A2%99/" rel="tag">被墙</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%A7%A3%E5%BF%A7%E6%9D%82%E8%B4%A7%E5%BA%97/" rel="tag">解忧杂货店</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%87%8D%E5%90%AF/" rel="tag">重启</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/" rel="tag">静态博客</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Anyoffice/" style="font-size: 10px;">Anyoffice</a> <a href="/tags/Caddy/" style="font-size: 10px;">Caddy</a> <a href="/tags/Excel/" style="font-size: 10px;">Excel</a> <a href="/tags/GUI/" style="font-size: 10px;">GUI</a> <a href="/tags/Golang%EF%BC%8CTotal-Commander/" style="font-size: 10px;">Golang，Total Commander</a> <a href="/tags/JSON/" style="font-size: 10px;">JSON</a> <a href="/tags/Outlook/" style="font-size: 10px;">Outlook</a> <a href="/tags/PowerQuery/" style="font-size: 13.33px;">PowerQuery</a> <a href="/tags/Powershell/" style="font-size: 10px;">Powershell</a> <a href="/tags/VIM/" style="font-size: 10px;">VIM</a> <a href="/tags/WebDAV/" style="font-size: 10px;">WebDAV</a> <a href="/tags/XML/" style="font-size: 10px;">XML</a> <a href="/tags/ahk/" style="font-size: 10px;">ahk</a> <a href="/tags/apache/" style="font-size: 20px;">apache</a> <a href="/tags/autohotkey/" style="font-size: 20px;">autohotkey</a> <a href="/tags/capslock/" style="font-size: 13.33px;">capslock</a> <a href="/tags/com/" style="font-size: 10px;">com</a> <a href="/tags/conda/" style="font-size: 10px;">conda</a> <a href="/tags/css/" style="font-size: 10px;">css</a> <a href="/tags/cygwin/" style="font-size: 13.33px;">cygwin</a> <a href="/tags/desktop/" style="font-size: 10px;">desktop</a> <a href="/tags/docker/" style="font-size: 16.67px;">docker</a> <a href="/tags/dynalist/" style="font-size: 10px;">dynalist</a> <a href="/tags/electron/" style="font-size: 10px;">electron</a> <a href="/tags/epub/" style="font-size: 10px;">epub</a> <a href="/tags/event/" style="font-size: 10px;">event</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/hadoop/" style="font-size: 10px;">hadoop</a> <a href="/tags/hbase/" style="font-size: 13.33px;">hbase</a> <a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a> <a href="/tags/iso/" style="font-size: 10px;">iso</a> <a href="/tags/junos/" style="font-size: 10px;">junos</a> <a href="/tags/jupyter/" style="font-size: 10px;">jupyter</a> <a href="/tags/keepass/" style="font-size: 10px;">keepass</a> <a href="/tags/load-balance/" style="font-size: 10px;">load balance</a> <a href="/tags/mac/" style="font-size: 10px;">mac</a> <a href="/tags/markdown/" style="font-size: 10px;">markdown</a> <a href="/tags/mesos/" style="font-size: 10px;">mesos</a> <a href="/tags/monit/" style="font-size: 10px;">monit</a> <a href="/tags/nodejs/" style="font-size: 10px;">nodejs</a> <a href="/tags/opensuse/" style="font-size: 13.33px;">opensuse</a> <a href="/tags/operator/" style="font-size: 10px;">operator</a> <a href="/tags/proxy/" style="font-size: 10px;">proxy</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/scoop/" style="font-size: 10px;">scoop</a> <a href="/tags/sendusingaccount/" style="font-size: 10px;">sendusingaccount</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/spark/" style="font-size: 10px;">spark</a> <a href="/tags/squirrel/" style="font-size: 10px;">squirrel</a> <a href="/tags/tabular/" style="font-size: 10px;">tabular</a> <a href="/tags/tomcat/" style="font-size: 16.67px;">tomcat</a> <a href="/tags/totalcmd/" style="font-size: 10px;">totalcmd</a> <a href="/tags/vagrant/" style="font-size: 10px;">vagrant</a> <a href="/tags/vim/" style="font-size: 13.33px;">vim</a> <a href="/tags/vmware/" style="font-size: 10px;">vmware</a> <a href="/tags/vscode/" style="font-size: 13.33px;">vscode</a> <a href="/tags/wiki/" style="font-size: 10px;">wiki</a> <a href="/tags/win10/" style="font-size: 10px;">win10</a> <a href="/tags/windows/" style="font-size: 10px;">windows</a> <a href="/tags/wiz/" style="font-size: 10px;">wiz</a> <a href="/tags/zookeeper/" style="font-size: 10px;">zookeeper</a> <a href="/tags/%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/" style="font-size: 10px;">中文输入</a> <a href="/tags/%E5%8F%91%E4%BB%B6%E7%AE%B1/" style="font-size: 10px;">发件箱</a> <a href="/tags/%E5%91%8A%E8%AD%A6/" style="font-size: 10px;">告警</a> <a href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" style="font-size: 16.67px;">命令行</a> <a href="/tags/%E5%9B%BE%E7%89%87/" style="font-size: 10px;">图片</a> <a href="/tags/%E5%BE%AE%E4%BF%A1/" style="font-size: 10px;">微信</a> <a href="/tags/%E5%BF%AB%E6%8D%B7%E9%94%AE/" style="font-size: 10px;">快捷键</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/" style="font-size: 10px;">数据透视表</a> <a href="/tags/%E6%96%87%E4%BB%B6%E5%A4%B9/" style="font-size: 10px;">文件夹</a> <a href="/tags/%E7%99%BB%E5%BD%95/" style="font-size: 10px;">登录</a> <a href="/tags/%E7%99%BD%E7%BA%B8%E6%9C%8B%E5%8F%8B/" style="font-size: 10px;">白纸朋友</a> <a href="/tags/%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84/" style="font-size: 10px;">相对路径</a> <a href="/tags/%E7%AE%80%E7%B9%81/" style="font-size: 10px;">简繁</a> <a href="/tags/%E7%BC%96%E8%AF%91/" style="font-size: 10px;">编译</a> <a href="/tags/%E8%A2%AB%E5%A2%99/" style="font-size: 10px;">被墙</a> <a href="/tags/%E8%A7%A3%E5%BF%A7%E6%9D%82%E8%B4%A7%E5%BA%97/" style="font-size: 10px;">解忧杂货店</a> <a href="/tags/%E9%87%8D%E5%90%AF/" style="font-size: 10px;">重启</a> <a href="/tags/%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2/" style="font-size: 13.33px;">静态博客</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archiv</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">January 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">November 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">April 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">November 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">October 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/01/">January 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/03/">March 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/02/">February 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/12/">December 2015</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">letzter Beitrag</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/">Excel汇总整个文件夹数据</a>
+          </li>
+        
+          <li>
+            <a href="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/">用PowerQuery制作多表数据透视表</a>
+          </li>
+        
+          <li>
+            <a href="/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/">Powershell调用Outlook的SendUsingAccount无效的解决方法</a>
+          </li>
+        
+          <li>
+            <a href="/2019/04/16/Dynalist%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%87%AA%E5%AE%9A%E4%B9%89CSS/">Dynalist客户端自定义CSS</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/14/Scoop%E5%BC%95%E5%8F%91%E7%9A%84%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7/">Scoop引发的命令行工具</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2020 lyallchan<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
