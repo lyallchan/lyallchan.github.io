@@ -1,0 +1,163 @@
+{
+  "main": {
+    "id": "7f3d200bba09ca12",
+    "type": "split",
+    "children": [
+      {
+        "id": "6ffcf76f8ad4b09e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a90a3df032210bc6",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "我的autohotkey设置.md",
+                "mode": "preview",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6d20ee3420a3853f",
+    "type": "split",
+    "children": [
+      {
+        "id": "d0f280681bd60972",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "baea7d009c6d086c",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "byCreatedTime"
+              }
+            }
+          },
+          {
+            "id": "dae7b103b3d59773",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "cff779fad65732af",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {}
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "9864838c175ce26a",
+    "type": "split",
+    "children": [
+      {
+        "id": "f90f1abb07afbd47",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6c8f8cf9fae0e6a1",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "我的autohotkey设置.md",
+                "collapseAll": false,
+                "extraContext": true,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "7135a58386e82780",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "我的autohotkey设置.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "c2362c8b41143a1d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "04eafedf5a42297e",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "我的autohotkey设置.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false
+    }
+  },
+  "active": "a90a3df032210bc6",
+  "lastOpenFiles": [
+    "我的autokey设置（三）.md",
+    "我的autohotkey设置（二）.md",
+    "我的autohotkey设置.md",
+    "重置Windows网络.md",
+    "重定义capslock键WIN.md",
+    "重定义capslock键MAC.md",
+    "命令行发送消息到微信企业号.md",
+    "使用VSCode在Hexo中使用图片.md",
+    "使用github和wiki_in_box建立博客.md",
+    "AHK热键按键次数和长按键.md",
+    "用PlayWright抓取动态页面.md",
+    "AHK输出到当前命令行.md"
+  ]
+}

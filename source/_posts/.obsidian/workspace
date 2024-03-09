@@ -1,0 +1,128 @@
+{
+  "main": {
+    "id": "7f3d200bba09ca12",
+    "type": "split",
+    "children": [
+      {
+        "id": "a90a3df032210bc6",
+        "type": "leaf",
+        "state": {
+          "type": "markdown",
+          "state": {
+            "file": "AHK热键按键次数和长按键.md",
+            "mode": "preview",
+            "source": false
+          }
+        }
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "6d20ee3420a3853f",
+    "type": "split",
+    "children": [
+      {
+        "id": "d0f280681bd60972",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "baea7d009c6d086c",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {}
+            }
+          },
+          {
+            "id": "dae7b103b3d59773",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "9864838c175ce26a",
+    "type": "split",
+    "children": [
+      {
+        "id": "f90f1abb07afbd47",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "6c8f8cf9fae0e6a1",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "AHK热键按键次数和长按键.md",
+                "collapseAll": false,
+                "extraContext": true,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "7135a58386e82780",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "AHK热键按键次数和长按键.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "c2362c8b41143a1d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true
+              }
+            }
+          },
+          {
+            "id": "04eafedf5a42297e",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "AHK热键按键次数和长按键.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "active": "a90a3df032210bc6",
+  "lastOpenFiles": [
+    "AHK热键按键次数和长按键.md",
+    "用PlayWright抓取动态页面.md",
+    "AHK输出到当前命令行.md"
+  ]
+}
