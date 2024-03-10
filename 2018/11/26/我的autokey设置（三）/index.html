@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="我的autokey设置（三）近期对整个系统的快捷键做了大幅的增改，主要设置在autohotkey中，但也有很多软件自己有快捷键，一并整理。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我的autokey设置（三）">
+<meta property="og:url" content="http://lyallchan.github.io/2018/11/26/%E6%88%91%E7%9A%84autokey%E8%AE%BE%E7%BD%AE%EF%BC%88%E4%B8%89%EF%BC%89/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="我的autokey设置（三）近期对整个系统的快捷键做了大幅的增改，主要设置在autohotkey中，但也有很多软件自己有快捷键，一并整理。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-11-26T02:33:14.000Z">
+<meta property="article:modified_time" content="2020-12-13T09:54:54.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="autohotkey">
+<meta property="article:tag" content="快捷键">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2018/11/26/%E6%88%91%E7%9A%84autokey%E8%AE%BE%E7%BD%AE%EF%BC%88%E4%B8%89%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>我的autokey设置（三） | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2018/11/26/%E6%88%91%E7%9A%84autokey%E8%AE%BE%E7%BD%AE%EF%BC%88%E4%B8%89%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          我的autokey设置（三）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-11-26 10:33:14" itemprop="dateCreated datePublished" datetime="2018-11-26T10:33:14+08:00">2018-11-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 17:54:54" itemprop="dateModified" datetime="2020-12-13T17:54:54+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="我的autokey设置（三）"><a href="#我的autokey设置（三）" class="headerlink" title="我的autokey设置（三）"></a>我的autokey设置（三）</h1><p>近期对整个系统的快捷键做了大幅的增改，主要设置在autohotkey中，但也有很多软件自己有快捷键，一并整理。</p>
+<span id="more"></span>
+
+<h1 id="AutoHotKey的设置"><a href="#AutoHotKey的设置" class="headerlink" title="AutoHotKey的设置"></a>AutoHotKey的设置</h1><h2 id="Capslock"><a href="#Capslock" class="headerlink" title="Capslock"></a>Capslock</h2><pre><code>1. Shift+Caps : 切换大小写
+2. 单独Caps ： ESC
+3. Caps+1 ： 激活TC，要求TC放在任务栏第一个
+4. Caps+2 ： 激活ConEMU，要求ConEMU放在任务栏第二个
+5. Caps+（hjklae） ： 任意程序除了VIM、Mintty、ConEMU、EMACS，上下左右，行首行尾，如果标题栏为Powershell或者cmd，则上述快捷键也有效
+6. Caps+（dwu） ： 如果标题栏为Powershell或者cmd，分别为退出、删除前一个单词，删除到行首
+7. Caps+其它键 ： Ctrl+其它键
+8. Caps+BS ： Caps+BS。特别是**ConEMU设置Ctrl-BS删除前一个单词**，则整个在ConEMU中运行的命令行，包括WSL、MINGW64、Cygwin、Powershell、cmd，都可以用Caps+BS删除前一个单词
+</code></pre>
+<h2 id="窗口类操作"><a href="#窗口类操作" class="headerlink" title="窗口类操作"></a>窗口类操作</h2><pre><code>1. alt+enter ： 切换最大化
+2. alt+m ： 最小化当前窗口
+3. alt+0 ： 切换窗口置顶
+4. alt++ ： 窗口更加不透明
+5. alt+- ： 窗口更加透明
+</code></pre>
+<h2 id="鼠标滚轮滚动事件"><a href="#鼠标滚轮滚动事件" class="headerlink" title="鼠标滚轮滚动事件"></a>鼠标滚轮滚动事件</h2><pre><code>1. 任务栏 ：切换桌面
+2. 屏幕顶端 ： 运行程序Claunch
+3. 标题栏 ：增加或者减少窗口透明度
+</code></pre>
+<h2 id="hjkl"><a href="#hjkl" class="headerlink" title="hjkl"></a>hjkl</h2><pre><code>1. 在TC中，使用VMATC设置
+2. SumatraPDF，使用AHK设置
+3. Chrome，使用VIM插件
+</code></pre>
+<h2 id="其它"><a href="#其它" class="headerlink" title="其它"></a>其它</h2><pre><code>1. ctrl win alt + q : alt-F4， 除了ConEMU
+2. ctrl alt + w : ctrl-w，除了ConEMU
+3. F12 : 切换虚拟桌面
+4. F3 : 下一个窗口，目前支持chrome，IE，edge。Conemu也支持，直接在Conemu中设置的
+5. F2 : 上一个窗口，目前支持chrome，IE，edge。Conemu也支持，直接在Conemu中设置的
+6. Win+o : TC/激活TC，拷贝当前路径到剪贴板
+7. Alt+r ： 运行CLauncher，CLauncher不常驻内存，用完即退出
+8. F3 ： 在TC的LIST中直接关闭，最后效果F3预览，预览完成后F3关闭，手指不移动
+9. ；+d ： 插入当前日期
+</code></pre>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/autohotkey/" rel="tag"># autohotkey</a>
+              <a href="/tags/%E5%BF%AB%E6%8D%B7%E9%94%AE/" rel="tag"># 快捷键</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/10/18/VIM%E7%BE%8E%E5%8C%96XML-JSON/" rel="prev" title="VIM美化XML-JSON">
+      <i class="fa fa-chevron-left"></i> VIM美化XML-JSON
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/03/14/Scoop%E5%BC%95%E5%8F%91%E7%9A%84%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%B7%A5%E5%85%B7/" rel="next" title="Scoop引发的命令行工具">
+      Scoop引发的命令行工具 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%88%91%E7%9A%84autokey%E8%AE%BE%E7%BD%AE%EF%BC%88%E4%B8%89%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">我的autokey设置（三）</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#AutoHotKey%E7%9A%84%E8%AE%BE%E7%BD%AE"><span class="nav-number">2.</span> <span class="nav-text">AutoHotKey的设置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Capslock"><span class="nav-number">2.1.</span> <span class="nav-text">Capslock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AA%97%E5%8F%A3%E7%B1%BB%E6%93%8D%E4%BD%9C"><span class="nav-number">2.2.</span> <span class="nav-text">窗口类操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%BC%A0%E6%A0%87%E6%BB%9A%E8%BD%AE%E6%BB%9A%E5%8A%A8%E4%BA%8B%E4%BB%B6"><span class="nav-number">2.3.</span> <span class="nav-text">鼠标滚轮滚动事件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hjkl"><span class="nav-number">2.4.</span> <span class="nav-text">hjkl</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E5%AE%83"><span class="nav-number">2.5.</span> <span class="nav-text">其它</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

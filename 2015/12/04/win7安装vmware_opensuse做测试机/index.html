@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="win7安装vmware_opensuse做测试机">
+<meta property="og:type" content="article">
+<meta property="og:title" content="win7安装vmware_opensuse做测试机">
+<meta property="og:url" content="http://lyallchan.github.io/2015/12/04/win7%E5%AE%89%E8%A3%85vmware_opensuse%E5%81%9A%E6%B5%8B%E8%AF%95%E6%9C%BA/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="win7安装vmware_opensuse做测试机">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2015-12-04T08:31:06.000Z">
+<meta property="article:modified_time" content="2020-12-13T09:54:54.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="opensuse">
+<meta property="article:tag" content="vmware">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2015/12/04/win7%E5%AE%89%E8%A3%85vmware_opensuse%E5%81%9A%E6%B5%8B%E8%AF%95%E6%9C%BA/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>win7安装vmware_opensuse做测试机 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2015/12/04/win7%E5%AE%89%E8%A3%85vmware_opensuse%E5%81%9A%E6%B5%8B%E8%AF%95%E6%9C%BA/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          win7安装vmware_opensuse做测试机
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2015-12-04 16:31:06" itemprop="dateCreated datePublished" datetime="2015-12-04T16:31:06+08:00">2015-12-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 17:54:54" itemprop="dateModified" datetime="2020-12-13T17:54:54+08:00">2020-12-13</time>
+              </span>
+
+          
+            <div class="post-description">win7安装vmware_opensuse做测试机</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><p>win7通过虚拟机安装opensuse，做为开发服务器。有几个目标：</p>
+<ol>
+<li><p>32位win7，安装vmware workstation 10</p>
+</li>
+<li><p>win7开机启动vmware，并且启动里面的opensuse</p>
+</li>
+<li><p>win7关机，opensuse挂起</p>
+</li>
+<li><p>win7开机登陆特定用户，登陆后，立刻锁定</p>
+<h1 id="几个功能点"><a href="#几个功能点" class="headerlink" title="几个功能点"></a>几个功能点</h1><h2 id="vmware开机自启动"><a href="#vmware开机自启动" class="headerlink" title="vmware开机自启动"></a>vmware开机自启动</h2><p>参考<a target="_blank" rel="noopener" href="http://blog.vsharing.com/hug_funs/A1010796.html">http://blog.vsharing.com/hug_funs/A1010796.html</a></p>
+<p>在win7的计划任务中，新建任务</p>
+</li>
+</ol>
+<ul>
+<li><p>名称随便取，这里取<code>VMWare</code></p>
+</li>
+<li><p>选择<code>不管用户是否登陆都要运行</code></p>
+</li>
+<li><p>触发器选择<code>在系统启动时</code></p>
+</li>
+<li><p>操作选择<code>启动程序</code>，命令行为<code>C:\Users\zqqian\bin\login.bat</code></p>
+</li>
+<li><p>其余选项用默认的即可</p>
+<p>确认后，会让你输入登陆用户的用户名和密码</p>
+<p>由于权限原因，vmware只能在当初安装的用户下运行，开机启动时，需要指定运行的用户</p>
+<p>login.bat的内容</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">REM startup opensuse in vmware</span></span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> Starting OpenSUSE <span class="keyword">in</span> VMware</span><br><span class="line"> </span><br><span class="line">&quot;C:\Program Files\VMware\VMware Workstation\vmrun.exe&quot; ^</span><br><span class="line">-T ws <span class="built_in">start</span> c:\users\zqqian\VOS\OpenSUSE\OpenSUSE.vmx nogui</span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> done.</span><br><span class="line">```  </span><br><span class="line"> </span><br><span class="line">`vmrun`是vmware自带命令，可以后台管理vmware，包括<span class="built_in">start</span>\stop\suspend，注意最后的`nogui`，不启动图形界面</span><br><span class="line"> </span><br><span class="line">## vmware关机挂起</span><br><span class="line"> </span><br><span class="line">参考http://blog.vsharing.com/hug_funs/A1010796.html</span><br><span class="line"> </span><br><span class="line">在win7的`gpedit.msc`中，设置关机脚本，并配置关机选项</span><br><span class="line"> </span><br><span class="line">+ `计算机配置` - `windows设置` - `脚本` - `关机`</span><br><span class="line">+ 添加关机脚本，脚本为`C:\Users\zqqian\bin\opensuse.stop.bat`</span><br><span class="line"> </span><br><span class="line">```bat</span><br><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment">REM stop opensuse in vmware</span></span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> Stopping OpenSUSE <span class="keyword">in</span> VMware</span><br><span class="line"> </span><br><span class="line">&quot;C:\Program Files\VMware\VMware Workstation\vmrun.exe&quot; ^</span><br><span class="line">-T ws suspend c:\users\zqqian\VOS\OpenSUSE\OpenSUSE.vmx soft</span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> done.</span><br><span class="line"> </span><br><span class="line"><span class="built_in">echo</span> sleep <span class="number">3</span>s</span><br><span class="line">sleep <span class="number">3</span>s</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>计算机配置</code> - <code>管理模版</code> - <code>系统</code> - <code>关机选项</code></p>
+</li>
+<li><p>启用<code>关闭会阻止或者取消关机的应用程序的自动终止功能</code></p>
+<p>这里使用了<code>vmrun</code>的suspend功能，注意最后的<code>soft</code>，vmware会调用客户机的suspend脚本，保护客户机操作系统不受损坏。</p>
+<p>suspend脚本通过vmware-tools安装，在客户机的<code>/etc/vmware-tools</code>下， 可以自行修改</p>
+<p>据网上查阅</p>
+<blockquote>
+<p>win7在关机时，如果有非系统进程阻塞关机，默认会强制关闭进程。<br><code>关闭会阻止或者取消关机的应用程序的自动终止功能</code>选项可以取消这种行为，<br>等待进程结束后，再关机，保证vmrun执行完毕。</p>
+</blockquote>
+</li>
+</ul>
+<p>实际测试的时候，不修改这个选项反而不会强制关闭进程。很奇怪！！</p>
+<p>由于这台win7装了cygwin，一般也是ssh上去使用的，因此，alias了reboot命令，直接调用这个suspend脚本。<br>这样，reboot可以保证执行，不会强制关闭。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">reboot=<span class="string">&#x27;~/bin/opensuse.stop.bat;/cygdrive/c/windows/system32/shutdown.exe /r /t 0&#x27;</span></span><br><span class="line">shutdown=<span class="string">&#x27;~/bin/opensuse.stop.bat;/cygdrive/c/windows/system32/shutdown.exe /s /t 0&#x27;</span></span><br></pre></td></tr></table></figure>
+<h2 id="开机自动登陆"><a href="#开机自动登陆" class="headerlink" title="开机自动登陆"></a>开机自动登陆</h2><p><code>Netplwiz</code>启动用户账户对话框，取消勾选<code>要使用本机，用户必须输入用户名和密码</code>，确定后，输入用户名和密码。</p>
+<h2 id="登陆后，自动锁定"><a href="#登陆后，自动锁定" class="headerlink" title="登陆后，自动锁定"></a>登陆后，自动锁定</h2><p><code>rundll32 user32.dll,LockWorkStation</code>可以锁定用户，将这条命令加到计划任务，触发器选择<code>登录时</code>，用户选择之前开机自动登陆的用户。</p>
+<h2 id="客户机suspend脚本安装，实现软关机"><a href="#客户机suspend脚本安装，实现软关机" class="headerlink" title="客户机suspend脚本安装，实现软关机"></a>客户机suspend脚本安装，实现软关机</h2><p>vmware安装好opensuse，启动并登陆。<br>在vmware界面上，选择<code>虚拟机</code> - <code>安装vmware-tools</code>，vmware会把iso文件加载到虚拟机光盘中。</p>
+<p>在opensuse，打命令安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo mount /dev/cdrom /mnt</span><br><span class="line"><span class="built_in">cd</span></span><br><span class="line"><span class="built_in">mkdir</span> tmp</span><br><span class="line"><span class="built_in">cd</span> tmp</span><br><span class="line">tar -xf /mnt/VMwareTools-9.6.5-2700074.tar.gz</span><br><span class="line"><span class="built_in">cd</span> vmware-tools-distrib/</span><br><span class="line">./vmware-install.pl</span><br></pre></td></tr></table></figure>
+<p>跟着提示安装，几个选项全部<code>yes</code>。<br>安装完成后，会提示你运行配置文件，几个选择全部选<code>no</code>。<br>安装和配置过程中，有几个告警，忽略。</p>
+<p>安装完成后，suspend脚本为<code>/etc/vmware-tools/suspend-vm-default</code>，默认的脚本运行报错，用空文件替换。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /etc/vmware-tools</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> `find ./ -name <span class="string">&quot;*default&quot;</span>`; <span class="keyword">do</span></span><br><span class="line">sudo <span class="built_in">mv</span> <span class="variable">$i</span> <span class="variable">$i</span>.bak</span><br><span class="line">sudo <span class="built_in">touch</span> <span class="variable">$i</span></span><br><span class="line">sudo <span class="built_in">chmod</span> 755 <span class="variable">$i</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/opensuse/" rel="tag"># opensuse</a>
+              <a href="/tags/vmware/" rel="tag"># vmware</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2015/12/04/%E4%BD%BF%E7%94%A8github%E5%92%8Cwiki_in_box%E5%BB%BA%E7%AB%8B%E5%8D%9A%E5%AE%A2/" rel="prev" title="使用github和wiki_in_box建立博客">
+      <i class="fa fa-chevron-left"></i> 使用github和wiki_in_box建立博客
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2015/12/04/tomcat_apache%E5%81%9A%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" rel="next" title="tomcat_apache做负载均衡">
+      tomcat_apache做负载均衡 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">1.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%87%A0%E4%B8%AA%E5%8A%9F%E8%83%BD%E7%82%B9"><span class="nav-number">2.</span> <span class="nav-text">几个功能点</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#vmware%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF%E5%8A%A8"><span class="nav-number">2.1.</span> <span class="nav-text">vmware开机自启动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E6%9C%BA%E8%87%AA%E5%8A%A8%E7%99%BB%E9%99%86"><span class="nav-number">2.2.</span> <span class="nav-text">开机自动登陆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%99%BB%E9%99%86%E5%90%8E%EF%BC%8C%E8%87%AA%E5%8A%A8%E9%94%81%E5%AE%9A"><span class="nav-number">2.3.</span> <span class="nav-text">登陆后，自动锁定</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%A2%E6%88%B7%E6%9C%BAsuspend%E8%84%9A%E6%9C%AC%E5%AE%89%E8%A3%85%EF%BC%8C%E5%AE%9E%E7%8E%B0%E8%BD%AF%E5%85%B3%E6%9C%BA"><span class="nav-number">2.4.</span> <span class="nav-text">客户机suspend脚本安装，实现软关机</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

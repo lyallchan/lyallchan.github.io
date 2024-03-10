@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="编译apache2.4">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译apache2.4">
+<meta property="og:url" content="http://lyallchan.github.io/2015/12/04/%E7%BC%96%E8%AF%91apache2-4/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="编译apache2.4">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2015-12-04T07:34:29.000Z">
+<meta property="article:modified_time" content="2020-12-13T09:54:54.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="apache">
+<meta property="article:tag" content="编译">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2015/12/04/%E7%BC%96%E8%AF%91apache2-4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>编译apache2.4 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2015/12/04/%E7%BC%96%E8%AF%91apache2-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          编译apache2.4
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2015-12-04 15:34:29" itemprop="dateCreated datePublished" datetime="2015-12-04T15:34:29+08:00">2015-12-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 17:54:54" itemprop="dateModified" datetime="2020-12-13T17:54:54+08:00">2020-12-13</time>
+              </span>
+
+          
+            <div class="post-description">编译apache2.4</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="apache2-4的特殊之处"><a href="#apache2-4的特殊之处" class="headerlink" title="apache2.4的特殊之处"></a>apache2.4的特殊之处</h1><p>Apache 2.4的源文件中，删除了必要的apr和apr-util等程序包，直接编译2.4的时候，会提示各种出错。</p>
+<p>2.4的<a target="_blank" rel="noopener" href="http://httpd.apache.org/docs/2.4/install.html">官方文档</a>有详细的描述</p>
+<blockquote>
+<p><strong>APR and APR-Util</strong><br>Make sure you have APR and APR-Util already installed on your system. If you don’t, or prefer to not use the system-provided versions, download the latest versions of both APR and APR-Util from Apache APR, unpack them into /httpd_source_tree_root/srclib/apr and /httpd_source_tree_root/srclib/apr-util (be sure the directory names do not have version numbers; for example, the APR distribution must be under /httpd_source_tree_root/srclib/apr/) and use ./configure’s –with-included-apr option. On some platforms, you may have to install the corresponding -dev packages to allow httpd to build against your installed copy of APR and APR-Util.<br><strong>Perl-Compatible Regular Expressions Library (PCRE)</strong><br>This library is required but not longer bundled with httpd. Download the source code from <a target="_blank" rel="noopener" href="http://www.pcre.org/">http://www.pcre.org</a>, or install a Port or Package. If your build system can’t find the pcre-config script installed by the PCRE build, point to it using the –with-pcre parameter. On some platforms, you may have to install the corresponding -dev package to allow httpd to build against your installed copy of PCRE.</p>
+</blockquote>
+<p>大致意思为</p>
+<blockquote>
+<p>编译Apache 2.4前，确保APR和APR-Util已经安装，如果没有安装，或者不想使用系统提供的APR版本，从<a target="_blank" rel="noopener" href="http://apr.apache.rog/">APR网站</a>下载最新版本的APR和APR-Util，将它们解压缩到apache2.4源代码的srclib目录，不能带版本号，即<code>/httpd-source-tree-root/srblic/apr/</code>。<br>apache用到PCRE，2.4版本没有包括PCRE模块。从<a target="_blank" rel="noopener" href="http://www.pcre.org/">PCRE</a>上下载源代码，编译安装。<br>apache ./configure的时候，使用–with-included-apr包含apr源码，使用–with-pcre指定编译安装后的PCRE位置。</p>
+</blockquote>
+<p>下面简单记录ubuntu下编译安装apache 2.4的过程</p>
+<h1 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">apt-get update</span><br><span class="line">apt-get -y install build-essential</span><br><span class="line"> </span><br><span class="line"><span class="built_in">cd</span> /</span><br><span class="line"><span class="built_in">mkdir</span> apache2 &amp;&amp; <span class="built_in">cd</span> apache2</span><br><span class="line"> </span><br><span class="line">wget http://apache.fayea.com//httpd/httpd-2.4.17.tar.gz</span><br><span class="line">wget http://apache.fayea.com//apr/apr-1.5.2.tar.gz</span><br><span class="line">wget http://apache.fayea.com//apr/apr-util-1.5.4.tar.gz</span><br><span class="line">wget ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.37.tar.gz</span><br></pre></td></tr></table></figure>
+<p>pcre下载有点麻烦，http下载方式被墙，ftp方式还可以用。找到下载链接后，直接wget。</p>
+<h1 id="编译pcre到-apache2-pcre"><a href="#编译pcre到-apache2-pcre" class="headerlink" title="编译pcre到/apache2/pcre"></a>编译pcre到/apache2/pcre</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /apache2</span><br><span class="line">tar xf pcre-8.37.tar.gz</span><br><span class="line"><span class="built_in">cd</span> pcre-8.37</span><br><span class="line">./configure --prefix=/apache2/pcre</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+<h1 id="编译apache2到-apache2-httpd"><a href="#编译apache2到-apache2-httpd" class="headerlink" title="编译apache2到/apache2/httpd"></a>编译apache2到/apache2/httpd</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"> </span><br><span class="line"><span class="comment"># 解压缩apache源码</span></span><br><span class="line"><span class="built_in">cd</span> /apache2</span><br><span class="line">tar xf httpd-2.4.17.tar.gz</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 解压缩apr和apr-util到apache源码目录的srclib目录，不能有版本号</span></span><br><span class="line"><span class="built_in">cd</span> httpd-2.4.17/srclib</span><br><span class="line">tar xf ../../apr-1.5.2.tar.gz</span><br><span class="line">tar xf ../../apr-util-1.5.4.tar.gz</span><br><span class="line"><span class="built_in">mv</span> apr-1.5.2 apr</span><br><span class="line"><span class="built_in">mv</span> apr-util-1.5.4 apr-util</span><br><span class="line"> </span><br><span class="line"><span class="comment"># 编译apache到/apache2/httpd</span></span><br><span class="line"><span class="comment"># 同时编译proxy相关的模块</span></span><br><span class="line"><span class="built_in">cd</span> /apache2/httpd-2.4.17</span><br><span class="line">./configure \</span><br><span class="line">--prefix=/apache2/httpd \                       <span class="comment"># 指定安装位置</span></span><br><span class="line">--with-included-apr \                           <span class="comment"># 指定apr源文件位置</span></span><br><span class="line">--with-pcre=../pcre \                           <span class="comment"># 指定prce位置</span></span><br><span class="line">--enable-proxy=shared \                         <span class="comment"># 下面几行都是编译proxy模块</span></span><br><span class="line">--enable-proxy_ajp=shared \</span><br><span class="line">--enable-proxy_connect=shared \</span><br><span class="line">--enable-proxy_http=shared \</span><br><span class="line">--enable-proxy_balancer=shared \</span><br><span class="line">--enable-slotmem_shm=shared \</span><br><span class="line">--enable-lbmethod_heartbeat=shared \            <span class="comment"># loadbalancer的4种方式</span></span><br><span class="line">--enable-lbmethod_byrequests=shared \</span><br><span class="line">--enable-lbmethod_bybusyness=shared \</span><br><span class="line">--enable-lbmethod_bytraffic=shared</span><br><span class="line">make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/apache/" rel="tag"># apache</a>
+              <a href="/tags/%E7%BC%96%E8%AF%91/" rel="tag"># 编译</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2015/12/04/%E9%87%8D%E5%AE%9A%E4%B9%89capslock%E9%94%AEMAC/" rel="next" title="重定义capslock键MAC">
+      重定义capslock键MAC <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#apache2-4%E7%9A%84%E7%89%B9%E6%AE%8A%E4%B9%8B%E5%A4%84"><span class="nav-number">1.</span> <span class="nav-text">apache2.4的特殊之处</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="nav-number">2.</span> <span class="nav-text">环境准备</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E8%AF%91pcre%E5%88%B0-apache2-pcre"><span class="nav-number">3.</span> <span class="nav-text">编译pcre到&#x2F;apache2&#x2F;pcre</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E8%AF%91apache2%E5%88%B0-apache2-httpd"><span class="nav-number">4.</span> <span class="nav-text">编译apache2到&#x2F;apache2&#x2F;httpd</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="安装好spark集群，使用jupyter notebook做为spark的客户端，或者官方叫做driver node">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用jupyter notebook做为spark客户端">
+<meta property="og:url" content="http://lyallchan.github.io/2017/03/03/spark_jupyter/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="安装好spark集群，使用jupyter notebook做为spark的客户端，或者官方叫做driver node">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-03-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-12-13T11:24:51.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="spark">
+<meta property="article:tag" content="jupyter">
+<meta property="article:tag" content="anaconda">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2017/03/03/spark_jupyter/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用jupyter notebook做为spark客户端 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2017/03/03/spark_jupyter/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用jupyter notebook做为spark客户端
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-03-03 00:00:00" itemprop="dateCreated datePublished" datetime="2017-03-03T00:00:00+08:00">2017-03-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 19:24:51" itemprop="dateModified" datetime="2020-12-13T19:24:51+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>安装好<a href="http://lyallchan.github.io/2017/03/02/spark_zookeeper/">spark集群</a>，使用jupyter notebook做为spark的客户端，或者官方叫做<code>driver node</code></p>
+<span id="more"></span>
+
+<h1 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h1><p>dockerfile</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># Creates anaconda with spark </span><br><span class="line"></span><br><span class="line">FROM java:on</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV SPARK=&quot;spark-2.1.0-bin-hadoop2.6&quot;</span><br><span class="line">ADD http://127.0.0.1:60060/$SPARK.tgz /</span><br><span class="line">RUN tar -xf /$SPARK.tgz \</span><br><span class="line">        &amp;&amp; ln -s /$SPARK /spark \</span><br><span class="line">        &amp;&amp; rm /$SPARK.tgz</span><br><span class="line">ENV PATH /spark/sbin:/spark/bin:$PATH</span><br><span class="line"></span><br><span class="line">ENV ANACONDA=Anaconda2-4.3.0-Linux-x86_64.sh</span><br><span class="line">ADD http://127.0.0.1:60060/$ANACONDA /</span><br><span class="line">RUN bash /$ANACONDA -b -p anaconda2</span><br><span class="line">RUN rm /$ANACONDA</span><br><span class="line">ENV PATH /anaconda2/bin:$PATH</span><br><span class="line">RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ \</span><br><span class="line">    &amp;&amp; conda config --set show_channel_urls yes</span><br><span class="line"></span><br><span class="line">ENV PYSPARK_DRIVER_PYTHON=jupyter</span><br><span class="line">ENV PYSPARK_DRIVER_PYTHON_OPTS=&quot;notebook --ip=* --NotebookApp.password=&#x27;&#x27; --NotebookApp.token=&#x27;&#x27; --no-browser&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>和<a href="http://lyallchan.github.io/2017/03/02/spark_zookeeper/">spark镜像</a>相比，这个镜像没有安装zookeeper，使用了功能更加全面的<a target="_blank" rel="noopener" href="https://docs.continuum.io/anaconda/install">anaconda</a>，其中包括了ipython，jupyter notebook</p>
+</li>
+<li><p>首先安装spark，python需要spark环境启动sc(SparkContext)</p>
+</li>
+<li><p>然后安装anaconda，并换国内源，加快下载速度</p>
+</li>
+<li><p>最后设置环境变量，使用pyspark启动jupyter notebook。pyspark在spark的/bin目录下，用来启动spark集群下的python环境，是个shell脚本，其中有这两个变量环境设置的详细说明</p>
+<blockquote>
+<p>In Spark 2.0, IPYTHON and IPYTHONOPTS are removed and pyspark fails to launchis set in the user’s environment. Instead, users should set PYSPARKDRIVERPYTHON to use IPython and set PYSPARK_DRIVER_PYTHON_OPTS to pass options when starting (e.g. PYSPARK_DRIVER_PYTHON_OPTS=’notebook’).  This supports full customization and executor Python executables.</p>
+</blockquote>
+</li>
+<li><p>jupyter notebook的参数为绑定任意IP地址，不需要密码，不需要token，不启动浏览器，详细说明可以参加<a target="_blank" rel="noopener" href="http://nbviewer.jupyter.org/github/ipython/ipython/blob/3.x/examples/Notebook/Configuring%20the%20Notebook%20and%20Server.ipynb">官网说明</a></p>
+</li>
+</ol>
+<h1 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h1><p>start.sh</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line"></span><br><span class="line">CONTAINER=&quot;conda&quot;</span><br><span class="line">NETWORK=&quot;spark&quot;</span><br><span class="line"></span><br><span class="line">if docker ps -a | grep $CONTAINER &gt; /dev/null; then</span><br><span class="line">    docker rm -f $CONTAINER &gt; /dev/null</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">V=`cygpath -aw $(dirname $0)/v`</span><br><span class="line"></span><br><span class="line">docker run \</span><br><span class="line">    -itd \</span><br><span class="line">    --hostname $CONTAINER \</span><br><span class="line">    --name $CONTAINER \</span><br><span class="line">    -v &quot;$V&quot;:/v:rw \</span><br><span class="line">    -w /v \</span><br><span class="line">    -p 127.0.0.1:8888:8888\</span><br><span class="line">    --net $NETWORK \</span><br><span class="line">    anaconda \</span><br><span class="line">    /bin/sh -c &quot;pyspark --master spark://spark1:7077,spark2:7077,spark3:7077&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>使用spark容器的network，以找到spark集群</li>
+<li>最后一行容器的启动命令一定要使用<code>/bin/sh -c &quot;pyspark ****&quot;</code>的形式，如果直接启动pyspark，会造成juypter notebook一直重启，使用/bin/bash也会有同样现象，很奇怪。详情可以参考<a target="_blank" rel="noopener" href="https://github.com/ipython/ipython/issues/8367">github的讨论</a></li>
+<li>pyspark指向的master为先前启动的spark standalone集群，url和启动spark slave服务时的url一致。</li>
+</ol>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>容器启动完成后，打开本机浏览器，指向localhost:8888就可以访问jupyter notebook</p>
+<ul>
+<li>在这个环境中已经启动好了sc，可以通过sc使用spark</li>
+<li>使用<code>docker logs -f conda</code>查看jupyter notebook输出</li>
+</ul>
+<p>跑一个官网例子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">import numpy as np</span><br><span class="line">from pyspark.mllib.stat import Statistics</span><br><span class="line"></span><br><span class="line">mat = sc.parallelize(</span><br><span class="line">    [np.array([1.0, 20.0, 300.0]), np.array([3.0, 10.0, 200.0]), np.array([2.0, 30.0, 100.0])],10</span><br><span class="line">)  # an RDD of Vectors</span><br><span class="line"></span><br><span class="line"># Compute column summary statistics.</span><br><span class="line">summary = Statistics.colStats(mat)</span><br><span class="line">print(summary.mean())  # a dense vector containing the mean value for each column</span><br><span class="line">print(summary.variance())  # column-wise variance</span><br><span class="line">print(summary.numNonzeros())  # number of nonzeros in each column</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/spark/" rel="tag"># spark</a>
+              <a href="/tags/jupyter/" rel="tag"># jupyter</a>
+              <a href="/tags/anaconda/" rel="tag"># anaconda</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/03/02/spark_zookeeper/" rel="prev" title="SPARK standalone HA with Zookeeper in docker">
+      <i class="fa fa-chevron-left"></i> SPARK standalone HA with Zookeeper in docker
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/03/17/spark-on-mesos-in-docker/" rel="next" title="spark on mesos in docker">
+      spark on mesos in docker <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%95%9C%E5%83%8F"><span class="nav-number">1.</span> <span class="nav-text">镜像</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8"><span class="nav-number">2.</span> <span class="nav-text">启动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

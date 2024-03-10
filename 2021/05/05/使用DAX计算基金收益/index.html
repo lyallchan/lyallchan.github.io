@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="使用DAX计算基金收益尝试用EXCEL记录基金的申购数据，用PowerQuery抓取基金历史净值，用PowerPivot计算基金收益。 所以这些都可以在一个EXCEL中完成。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用DAX计算基金收益">
+<meta property="og:url" content="http://lyallchan.github.io/2021/05/05/%E4%BD%BF%E7%94%A8DAX%E8%AE%A1%E7%AE%97%E5%9F%BA%E9%87%91%E6%94%B6%E7%9B%8A/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="使用DAX计算基金收益尝试用EXCEL记录基金的申购数据，用PowerQuery抓取基金历史净值，用PowerPivot计算基金收益。 所以这些都可以在一个EXCEL中完成。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lyallchan.github.io/2021/05/05/%E4%BD%BF%E7%94%A8DAX%E8%AE%A1%E7%AE%97%E5%9F%BA%E9%87%91%E6%94%B6%E7%9B%8A/2021-05-05-13-27-18.png">
+<meta property="article:published_time" content="2021-05-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-05-05T06:02:45.140Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="DAX">
+<meta property="article:tag" content="基金">
+<meta property="article:tag" content="EXCEL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lyallchan.github.io/2021/05/05/%E4%BD%BF%E7%94%A8DAX%E8%AE%A1%E7%AE%97%E5%9F%BA%E9%87%91%E6%94%B6%E7%9B%8A/2021-05-05-13-27-18.png">
+
+<link rel="canonical" href="http://lyallchan.github.io/2021/05/05/%E4%BD%BF%E7%94%A8DAX%E8%AE%A1%E7%AE%97%E5%9F%BA%E9%87%91%E6%94%B6%E7%9B%8A/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用DAX计算基金收益 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2021/05/05/%E4%BD%BF%E7%94%A8DAX%E8%AE%A1%E7%AE%97%E5%9F%BA%E9%87%91%E6%94%B6%E7%9B%8A/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用DAX计算基金收益
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-05-05 00:00:00 / 修改时间：14:02:45" itemprop="dateCreated datePublished" datetime="2021-05-05T00:00:00+08:00">2021-05-05</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="使用DAX计算基金收益"><a href="#使用DAX计算基金收益" class="headerlink" title="使用DAX计算基金收益"></a>使用DAX计算基金收益</h1><p>尝试用EXCEL记录基金的申购数据，用PowerQuery抓取基金历史净值，用PowerPivot计算基金收益。</p>
+<p>所以这些都可以在一个EXCEL中完成。</p>
+<span id="more"></span>
+
+<h1 id="模型，表和关系"><a href="#模型，表和关系" class="headerlink" title="模型，表和关系"></a>模型，表和关系</h1><h2 id="1-申购记录"><a href="#1-申购记录" class="headerlink" title="1. 申购记录"></a>1. 申购记录</h2><p>申购记录表是日常记录申购过程的表，包括6个字段。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">基金代码、基金名称、交易日期、确认份额、申购金额、手续费</span><br></pre></td></tr></table></figure>
+
+<p>其中<br><code>申购金额</code>减去<code>手续费</code>是购买基金的市值，比如投资5000，手续费50，则购买的基金市值为4500。<br>这张表是填写的，记录了每一笔申购，包括基金分红，因为基金分红会引起基金份额变动。基金分工的申购金额和手续费都为0。</p>
+<h2 id="2-历史净值"><a href="#2-历史净值" class="headerlink" title="2. 历史净值"></a>2. 历史净值</h2><p>包括字段</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">基金代码、基金名称、日期、净值</span><br></pre></td></tr></table></figure>
+
+<p>根据申购记录，抓取基金的历史净值。</p>
+<h2 id="3-基金清单"><a href="#3-基金清单" class="headerlink" title="3. 基金清单"></a>3. 基金清单</h2><p>包括字段</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">基金代码、基金名称</span><br></pre></td></tr></table></figure>
+
+<p>所有已申购的基金清单，是根据申购记录自动生成。</p>
+<h2 id="4-日期表"><a href="#4-日期表" class="headerlink" title="4. 日期表"></a>4. 日期表</h2><p>包括</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">日期、年、月、日等</span><br></pre></td></tr></table></figure>
+
+<p>日期表是连续日期，包括非交易日的日期</p>
+<h2 id="关系"><a href="#关系" class="headerlink" title="关系"></a>关系</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">日期表（日期） - 申购记录（交易日期）</span><br><span class="line">日期表（日期） - 历史净值（日期）</span><br><span class="line">基金清单（基金代码） - 申购记录（基金代码）</span><br><span class="line">基金清单（基金代码） - 历史净值（基金代码）</span><br></pre></td></tr></table></figure>
+
+<p>如下图</p>
+<img src="/2021/05/05/%E4%BD%BF%E7%94%A8DAX%E8%AE%A1%E7%AE%97%E5%9F%BA%E9%87%91%E6%94%B6%E7%9B%8A/2021-05-05-13-27-18.png" class="">
+
+
+<h1 id="度量值"><a href="#度量值" class="headerlink" title="度量值"></a>度量值</h1><h2 id="持仓类度量值"><a href="#持仓类度量值" class="headerlink" title="持仓类度量值"></a>持仓类度量值</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">持仓总成本、持仓总份额、最新净值、持仓总市值、持仓总收益、持仓收益率、持仓年化收益率</span><br></pre></td></tr></table></figure>
+
+<h2 id="期间类度量值"><a href="#期间类度量值" class="headerlink" title="期间类度量值"></a>期间类度量值</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">期初净值、期初份额、期初市值、期末净值、期末份额、期末市值、期间成本、期间收益、期间收益率</span><br></pre></td></tr></table></figure>
+
+<p>两者区别：</p>
+<ul>
+<li><code>持仓类</code>度量值是从持仓起一直到需要统计的时间，比如<code>2021-1-1</code>开始持仓、统计到<code>2021-3-31</code>的指标值</li>
+<li><code>期间类</code>度量值是一个时间段之间的指标值，比如统计2021年2月份的指标值，即<code>2021-2-1到2021-2-28</code>的指标值</li>
+<li>所有度量值都要支持单个基金和所有基金的汇总</li>
+</ul>
+<p>这一篇文章讲持仓类度量值算法，下一篇讲期间类度量值算法。</p>
+<h1 id="持仓类度量值-1"><a href="#持仓类度量值-1" class="headerlink" title="持仓类度量值"></a>持仓类度量值</h1><h2 id="最新净值"><a href="#最新净值" class="headerlink" title="最新净值"></a>最新净值</h2><p>最新净值计算比较复杂，要考虑到没有交易的日期，还要考虑最后交易日比统计日期范围都要早的情况。</p>
+<p>最终统计逻辑为</p>
+<p><strong><code>各类筛选器指定的日期范围，比最后日期早的最后一个交易日对应的历史净值</code></strong></p>
+<ul>
+<li>情形一：计算年初到2021年2月份的各类指标，2月份最后一天是<code>2021-2-28</code>周日，非交易日，最新净值应该是<code>2021-2-26</code>的净值。<code>2021-2-26</code>是比<code>2021-2-28</code>早的最后一个交易日。</li>
+<li>情形二：统计范围<code>2021-4-10</code>到<code>2021-4-11</code>的指标，<code>2021-4-11</code>是非交易日，最新净值应该是<code>2021-4-9</code>的净值，比统计范围还要早。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">最新净值:=</span><br><span class="line">VAR v = // 计算比最后日期早的最后一个交易日</span><br><span class="line">    CALCULATE(</span><br><span class="line">        MAX( &#x27;历史净值&#x27;[日期] ),</span><br><span class="line">        FILTER( ALL( &#x27;日期表&#x27;[日期] ), &#x27;日期表&#x27;[日期] &lt;= MAX( &#x27;日期表&#x27;[日期] ) )</span><br><span class="line">    )</span><br><span class="line">VAR w = // 日期等于`v`的历史净值，如果是汇总行，包括了多个基金，会返回多个净值，这里返回基金的个数，也可以返回空值</span><br><span class="line">    CALCULATE(</span><br><span class="line">        IF( HASONEVALUE( &#x27;历史净值&#x27;[净值] ), VALUES( &#x27;历史净值&#x27;[净值] ), COUNTROWS( &#x27;历史净值&#x27; ) ),</span><br><span class="line">        FILTER( ALL( &#x27;日期表&#x27;[日期] ), &#x27;日期表&#x27;[日期] = v )</span><br><span class="line">    )</span><br><span class="line">RETURN</span><br><span class="line">    w</span><br></pre></td></tr></table></figure>
+
+<p>另一种算法：找出所有比最后日期早的历史净值表，找出这张表的最大日期对应的净值</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">最新净值2:=</span><br><span class="line">VAR v =</span><br><span class="line">    CALCULATETABLE(</span><br><span class="line">        &#x27;历史净值&#x27;,</span><br><span class="line">        FILTER( ALL( &#x27;日期表&#x27;[日期] ), &#x27;日期表&#x27;[日期] &lt;= MAX( &#x27;日期表&#x27;[日期] ) )</span><br><span class="line">    )</span><br><span class="line">VAR x =</span><br><span class="line">    MAXX( v, [日期] )</span><br><span class="line">VAR s =</span><br><span class="line">    FILTER( v, [日期] = x )</span><br><span class="line">VAR t =</span><br><span class="line">    SELECTCOLUMNS( s, &quot;净值&quot;, [净值] )</span><br><span class="line">RETURN</span><br><span class="line">    t</span><br></pre></td></tr></table></figure>
+
+<h2 id="持仓总份额"><a href="#持仓总份额" class="headerlink" title="持仓总份额"></a>持仓总份额</h2><p>所有申购记录的确认份额累加</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">持仓总份额:=</span><br><span class="line">CALCULATE(</span><br><span class="line">    SUM( &#x27;申购记录&#x27;[确认份额] ),</span><br><span class="line">    FILTER( ALL( &#x27;日期表&#x27;[日期] ), &#x27;日期表&#x27;[日期] &lt;= MAX( &#x27;日期表&#x27;[日期] ) )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="持仓总成本"><a href="#持仓总成本" class="headerlink" title="持仓总成本"></a>持仓总成本</h2><p>所有申购记录的申购金额累加</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">持仓总成本:=</span><br><span class="line">CALCULATE(</span><br><span class="line">    SUM( &#x27;申购记录&#x27;[申购金额] ),</span><br><span class="line">    FILTER( ALL( &#x27;日期表&#x27;[日期] ), &#x27;日期表&#x27;[日期] &lt;= MAX( &#x27;日期表&#x27;[日期] ) )</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h2 id="持仓总市值"><a href="#持仓总市值" class="headerlink" title="持仓总市值"></a>持仓总市值</h2><p>持仓总份额*最新净值，考虑到汇总行，需要对不同的基金累加</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">持仓总市值:= SUMX( &#x27;基金清单&#x27;, [持仓总份额] * [最新净值] )</span><br></pre></td></tr></table></figure>
+
+<h2 id="持仓总收益"><a href="#持仓总收益" class="headerlink" title="持仓总收益"></a>持仓总收益</h2><p>持仓总市值 - 持仓总成本</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">持仓总收益:= [持仓总市值] - [持仓总成本]</span><br></pre></td></tr></table></figure>
+
+<h2 id="持仓收益率"><a href="#持仓收益率" class="headerlink" title="持仓收益率"></a>持仓收益率</h2><p>持仓总收益 / 持仓总成本，这里用安全的除法函数DIVIDE，可以处理除零的情况</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">持仓收益率:= DIVIDE( [持仓总收益], [持仓总成本] )</span><br></pre></td></tr></table></figure>
+
+<h2 id="持仓年化收益率"><a href="#持仓年化收益率" class="headerlink" title="持仓年化收益率"></a>持仓年化收益率</h2><h3 id="持仓年化收益率简化版"><a href="#持仓年化收益率简化版" class="headerlink" title="持仓年化收益率简化版"></a>持仓年化收益率简化版</h3><p>计算每天收益率*365天，即年化收益率</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">每天收益率 = 持仓总收益 / 持仓时间</span><br><span class="line">持仓时间 = 最后交易日 - 首次交易日</span><br><span class="line">最后交易日 = 日期表所有时间范围的最大历史净值日期，如果比首次交易日还要早，则等于首次交易日</span><br><span class="line">首次交易日 = 持仓总份额大于0的最小时间</span><br></pre></td></tr></table></figure>
+
+<h3 id="首次交易日"><a href="#首次交易日" class="headerlink" title="首次交易日"></a>首次交易日</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">首次交易日:=</span><br><span class="line">CALCULATE( MIN( &#x27;日期表&#x27;[日期] ), FILTER( ALL( &#x27;日期表&#x27; ), [持仓总份额] &gt; 0 ) )</span><br></pre></td></tr></table></figure>
+
+<h3 id="最后交易日"><a href="#最后交易日" class="headerlink" title="最后交易日"></a>最后交易日</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">最后交易日:=</span><br><span class="line">VAR v =</span><br><span class="line">    CALCULATE(</span><br><span class="line">        MAX( &#x27;历史净值&#x27;[日期] ),</span><br><span class="line">        FILTER( ALL( &#x27;日期表&#x27;[日期] ), &#x27;日期表&#x27;[日期] &lt;= MAX( &#x27;日期表&#x27;[日期] ) )</span><br><span class="line">    )</span><br><span class="line">VAR t = [首次交易日]</span><br><span class="line">RETURN</span><br><span class="line">    IF( v &lt; t, t, v )</span><br></pre></td></tr></table></figure>
+
+<h3 id="持仓时间"><a href="#持仓时间" class="headerlink" title="持仓时间"></a>持仓时间</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">持仓时间:= DATEDIFF( [首次交易日], [最后交易日], DAY ) + 1</span><br></pre></td></tr></table></figure>
+
+<h3 id="持仓年化收益率（简化）"><a href="#持仓年化收益率（简化）" class="headerlink" title="持仓年化收益率（简化）"></a>持仓年化收益率（简化）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">持仓年化收益率（简化）:= DIVIDE( [持仓收益率], [持仓时间] ) * 365</span><br></pre></td></tr></table></figure>
+
+<h2 id="持仓年化收益率-1"><a href="#持仓年化收益率-1" class="headerlink" title="持仓年化收益率"></a>持仓年化收益率</h2><p>使用函数XIRR计算年化收益率，具体可以看excel的XIRR的说明。需要动态生成XIRR所需要的表。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">持仓年化收益率:= </span><br><span class="line">VAR _f =</span><br><span class="line">    // 取消日期表的最小值限制，比如原范围是2021-4-1到2021-4-30，则_f的范围是所有小于2021-4-30的日期</span><br><span class="line">    CALCULATETABLE(</span><br><span class="line">        &#x27;申购记录&#x27;,</span><br><span class="line">        FILTER( ALL( &#x27;日期表&#x27;[日期] ), &#x27;日期表&#x27;[日期] &lt;= MAX( &#x27;日期表&#x27;[日期] ) )</span><br><span class="line">    )</span><br><span class="line">VAR _t =</span><br><span class="line">    // 取其中日期和金额两列</span><br><span class="line">    SELECTCOLUMNS( _f, &quot;日期&quot;, &#x27;申购记录&#x27;[交易日期], &quot;金额&quot;, &#x27;申购记录&#x27;[申购金额] * ( -1 ) )</span><br><span class="line">VAR _t1 =</span><br><span class="line">    // 最后交易时间</span><br><span class="line">    CALCULATE(</span><br><span class="line">        MAX( &#x27;历史净值&#x27;[日期] ),</span><br><span class="line">        FILTER( ALL( &#x27;日期表&#x27;[日期] ), &#x27;日期表&#x27;[日期] &lt;= MAX( &#x27;日期表&#x27;[日期] ) )</span><br><span class="line">    )</span><br><span class="line">VAR _t2 = [持仓总市值]</span><br><span class="line">VAR _t3 =</span><br><span class="line">    UNION( _t, ROW( &quot;日期&quot;, _t1, &quot;金额&quot;, _t2 ) )</span><br><span class="line">VAR _t4 = [期末份额]</span><br><span class="line">RETURN</span><br><span class="line">    IF( _t4 = 0, BLANK(), XIRR( _t3, [金额], [日期] ) )</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/DAX/" rel="tag"># DAX</a>
+              <a href="/tags/%E5%9F%BA%E9%87%91/" rel="tag"># 基金</a>
+              <a href="/tags/EXCEL/" rel="tag"># EXCEL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/" rel="prev" title="用EXCEL爬取网页获得基金重仓股票数据">
+      <i class="fa fa-chevron-left"></i> 用EXCEL爬取网页获得基金重仓股票数据
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/10/05/Win10%E5%BC%80%E9%80%9ASSHD/" rel="next" title="Win10开通SSHD">
+      Win10开通SSHD <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8DAX%E8%AE%A1%E7%AE%97%E5%9F%BA%E9%87%91%E6%94%B6%E7%9B%8A"><span class="nav-number">1.</span> <span class="nav-text">使用DAX计算基金收益</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%EF%BC%8C%E8%A1%A8%E5%92%8C%E5%85%B3%E7%B3%BB"><span class="nav-number">2.</span> <span class="nav-text">模型，表和关系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%94%B3%E8%B4%AD%E8%AE%B0%E5%BD%95"><span class="nav-number">2.1.</span> <span class="nav-text">1. 申购记录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%8E%86%E5%8F%B2%E5%87%80%E5%80%BC"><span class="nav-number">2.2.</span> <span class="nav-text">2. 历史净值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%9F%BA%E9%87%91%E6%B8%85%E5%8D%95"><span class="nav-number">2.3.</span> <span class="nav-text">3. 基金清单</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%97%A5%E6%9C%9F%E8%A1%A8"><span class="nav-number">2.4.</span> <span class="nav-text">4. 日期表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB"><span class="nav-number">2.5.</span> <span class="nav-text">关系</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BA%A6%E9%87%8F%E5%80%BC"><span class="nav-number">3.</span> <span class="nav-text">度量值</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E7%B1%BB%E5%BA%A6%E9%87%8F%E5%80%BC"><span class="nav-number">3.1.</span> <span class="nav-text">持仓类度量值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%9F%E9%97%B4%E7%B1%BB%E5%BA%A6%E9%87%8F%E5%80%BC"><span class="nav-number">3.2.</span> <span class="nav-text">期间类度量值</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E7%B1%BB%E5%BA%A6%E9%87%8F%E5%80%BC-1"><span class="nav-number">4.</span> <span class="nav-text">持仓类度量值</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%80%E6%96%B0%E5%87%80%E5%80%BC"><span class="nav-number">4.1.</span> <span class="nav-text">最新净值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E6%80%BB%E4%BB%BD%E9%A2%9D"><span class="nav-number">4.2.</span> <span class="nav-text">持仓总份额</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E6%80%BB%E6%88%90%E6%9C%AC"><span class="nav-number">4.3.</span> <span class="nav-text">持仓总成本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E6%80%BB%E5%B8%82%E5%80%BC"><span class="nav-number">4.4.</span> <span class="nav-text">持仓总市值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E6%80%BB%E6%94%B6%E7%9B%8A"><span class="nav-number">4.5.</span> <span class="nav-text">持仓总收益</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E6%94%B6%E7%9B%8A%E7%8E%87"><span class="nav-number">4.6.</span> <span class="nav-text">持仓收益率</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E5%B9%B4%E5%8C%96%E6%94%B6%E7%9B%8A%E7%8E%87"><span class="nav-number">4.7.</span> <span class="nav-text">持仓年化收益率</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E5%B9%B4%E5%8C%96%E6%94%B6%E7%9B%8A%E7%8E%87%E7%AE%80%E5%8C%96%E7%89%88"><span class="nav-number">4.7.1.</span> <span class="nav-text">持仓年化收益率简化版</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A6%96%E6%AC%A1%E4%BA%A4%E6%98%93%E6%97%A5"><span class="nav-number">4.7.2.</span> <span class="nav-text">首次交易日</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E4%BA%A4%E6%98%93%E6%97%A5"><span class="nav-number">4.7.3.</span> <span class="nav-text">最后交易日</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E6%97%B6%E9%97%B4"><span class="nav-number">4.7.4.</span> <span class="nav-text">持仓时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E5%B9%B4%E5%8C%96%E6%94%B6%E7%9B%8A%E7%8E%87%EF%BC%88%E7%AE%80%E5%8C%96%EF%BC%89"><span class="nav-number">4.7.5.</span> <span class="nav-text">持仓年化收益率（简化）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%81%E4%BB%93%E5%B9%B4%E5%8C%96%E6%94%B6%E7%9B%8A%E7%8E%87-1"><span class="nav-number">4.8.</span> <span class="nav-text">持仓年化收益率</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

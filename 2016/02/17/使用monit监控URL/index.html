@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="监控一个主机的WEB服务是否存活，最有效的方法是直接监控提供WEB服务的进程，如apache、nginx或者tomcat、was之类的，如果进程消失，肯定有故障。实际过程中，经常会有进程还在，但是不能对外提供服务了，有必要再增加直接监控的WEB端口的手段，WEB端口不能访问了，哪怕WEB服务进程还在，也需要告警。两种方式互为补充。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用monit监控URL">
+<meta property="og:url" content="http://lyallchan.github.io/2016/02/17/%E4%BD%BF%E7%94%A8monit%E7%9B%91%E6%8E%A7URL/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="监控一个主机的WEB服务是否存活，最有效的方法是直接监控提供WEB服务的进程，如apache、nginx或者tomcat、was之类的，如果进程消失，肯定有故障。实际过程中，经常会有进程还在，但是不能对外提供服务了，有必要再增加直接监控的WEB端口的手段，WEB端口不能访问了，哪怕WEB服务进程还在，也需要告警。两种方式互为补充。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-02-17T00:32:01.000Z">
+<meta property="article:modified_time" content="2020-12-13T09:54:54.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="monit">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2016/02/17/%E4%BD%BF%E7%94%A8monit%E7%9B%91%E6%8E%A7URL/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用monit监控URL | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2016/02/17/%E4%BD%BF%E7%94%A8monit%E7%9B%91%E6%8E%A7URL/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用monit监控URL
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-02-17 08:32:01" itemprop="dateCreated datePublished" datetime="2016-02-17T08:32:01+08:00">2016-02-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 17:54:54" itemprop="dateModified" datetime="2020-12-13T17:54:54+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>监控一个主机的WEB服务是否存活，最有效的方法是直接监控提供WEB服务的进程，如apache、nginx或者tomcat、was之类的，如果进程消失，肯定有故障。实际过程中，经常会有进程还在，但是不能对外提供服务了，有必要再增加直接监控的WEB端口的手段，WEB端口不能访问了，哪怕WEB服务进程还在，也需要告警。两种方式互为补充。</p>
+<span id="more"></span>
+<h1 id="monit"><a href="#monit" class="headerlink" title="monit"></a>monit</h1><p><a target="_blank" rel="noopener" href="http://mmonit.com/monit/">monit</a>是一个轻量的监控工具，大小不到1M，提供的功能很丰富，能监控本机的CPU、文件、目录、进程等基本信息，也能监控本机的网卡，包括网卡UP/Down、网络流量告警，还能监控其它主机的网络可达性，包括第4层协议、第7层协议，HTTP做为第7层协议自然也支持。发现告警之后，能定义各种告警动作，包括发送邮件，重启进程，运行特定脚本/程序。</p>
+<p>集中式的监控系统，如nagios，zabbix，cacti，在一台主机上监控所有其它主机，存在单点故障。 monit一般部署在每台需要监控的主机上，可以认为是分布式系统，可以作为集中式监控的补充。</p>
+<p>monit只有一个配置文件，在monit启动命令行指定。<br>下面记录monit安装和监控主机IP:PORT的过程。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>monit只有类unix版本，没有windows版本。ubuntu下安装很简单</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install monit</span><br></pre></td></tr></table></figure>
+<p>安装好以后，可执行文件为<code>/usr/bin/monit</code>，配置文件为<code>/etc/monit/monitrc</code>，daemon文件为<code>/etc/init.d/monit</code>，还有一个upstart的启动文件，若干man，example文件，总共1M不到。</p>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p><code>/etc/monit/monitrc</code>本身就是一个详细的配置帮助文件，根据我们的目标，选择了如下的一些配置</p>
+<h2 id="基本的daemon配置"><a href="#基本的daemon配置" class="headerlink" title="基本的daemon配置"></a>基本的daemon配置</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">set daemon 3600</span><br><span class="line">set logfile /var/log/monit.log</span><br><span class="line">set idfile /var/lib/monit/id</span><br><span class="line">set statefile /var/lib/monit/state</span><br></pre></td></tr></table></figure>
+<p>第1条命令指定monit运行在daemon模式，3600s也就是1个小时轮询一次。deamon模式是monit主要运行模式。如果不使用daemon模式，monit只运行一次，然后退出。monit运行在daemon模式，如果在命令行再次运行monit，则会发送wake-up信号给monit后台进程，然后马上做一次轮询。<code>monit quit</code>会kill掉monit后台进程。<br>其余3条命令指定log、id和state文件。</p>
+<h2 id="email告警配置"><a href="#email告警配置" class="headerlink" title="email告警配置"></a>email告警配置</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">set mailserver smtp.163.com</span><br><span class="line">  username xxx@xxx.com</span><br><span class="line">  password xxxx</span><br><span class="line">  using sslv3</span><br><span class="line"> </span><br><span class="line">set mail-format &#123;</span><br><span class="line">    from: xxx@xxx.com</span><br><span class="line">    reply-to: xxx@xxx.com</span><br><span class="line">    subject: monit alert $SERVICE $EVENT</span><br><span class="line">    message: Monit alert at $DATE</span><br><span class="line">             $HOST $ACTION $SERVICE</span><br><span class="line">&#125;</span><br><span class="line">set alert xxx@xxx.com</span><br><span class="line">set eventqueue basedir /var/lib/monit/events slots 100</span><br></pre></td></tr></table></figure>
+<p>第一组命令指定smtp服务器以及相应的账号和ssl版本，smtp服务器用来发送告警邮件。<br>第二组命令指定告警邮件的格式，可用的变量为</p>
+<ul>
+<li><p>$EVENT: 事件</p>
+</li>
+<li><p>$SERVICE: 服务名称。monit将每个监控对象定义成服务，实际上就是监控对象</p>
+</li>
+<li><p>$DATE: 告警日期和时间</p>
+</li>
+<li><p>$HOST: monit运行的主机，这在多台主机都运行monit的时候有用</p>
+</li>
+<li><p>$ACTION: 告警发生后，monit的动作。这个动作在定义监控服务的时候指定。</p>
+</li>
+<li><p>$DESCRIPTION: 告警描述<br>第三条命令指定告警邮件接收人，可以有多个，使用<code>,</code>分隔<br>第四条命令指定当smtp服务器有故障的时候，本地暂存告警邮件的位置以及数量，这里暂存100条</p>
+<p>上面是全局的邮件告警配置，在后面配置单个服务的时候，还可以指定针对这个服务的告警配置，当两者有冲突时，以单个服务的配置为准。</p>
+<h2 id="HTTPD配置"><a href="#HTTPD配置" class="headerlink" title="HTTPD配置"></a>HTTPD配置</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">set httpd port 2812</span><br><span class="line">  allow 127.0.0.1</span><br><span class="line">  allow 10.6.86.226</span><br><span class="line">  allow 10.6.86.228</span><br><span class="line">  allow 10.6.86.1</span><br><span class="line">  allow 172.17.42.1</span><br><span class="line">  allow root:admin read-only</span><br></pre></td></tr></table></figure>
+
+<p>monit内置了一个http server，开启后，可以在浏览器上查看监控状态。monit强烈建议开启http server。monit的命令行命令（如monit status/quit）通过http接口和后台进程交互，如果不开启http server，相应的命令行命令不能使用。<br>monit还支持ssl方式，即可以用https访问，相对来说安全一点。https需要证书，具体配置可以看<a target="_blank" rel="noopener" href="https://www.mmonit.com/monit/documentation/monit.html">官方文档</a>。</p>
+<p>前面5个allow，指定可以访问monit httpd的客户IP地址，不要忘了127.0.0.1，否则monit命令不能执行访问http接口。<br>最后一个allow指定web访问的账号，并且规定只读权限。<br>monit支持简单认证和PAM认证。上述方式是简单认证。简单认证发送的是明文账号，存在不安全性。monit建议在开启https功能后，使用简单认证。这里的使用环境是内网环境，相对安全，因此在没有开启https的情况下，也使用了简单认证。<br>PAM认证就是使用monit所在主机的系统账号，并且只支持账号组的方式，相应的配置格式为<code>allow @group</code>，在group组内的账号都可以web访问。</p>
+<h2 id="定义服务"><a href="#定义服务" class="headerlink" title="定义服务"></a>定义服务</h2><p>定义服务，就是定义监控对象。monit文档都叫服务，我觉得这里叫做监控比较好。</p>
+<h3 id="服务类型"><a href="#服务类型" class="headerlink" title="服务类型"></a>服务类型</h3><p>monit可以定义9种类型，包括process/file/fifo/filesystem/directory/system/program/network/host。</p>
+</li>
+<li><p>process: 监控指定进程是否存活</p>
+</li>
+<li><p>file/fifo/filesystem/directory: 监控指定的文件或者目录是否存在</p>
+</li>
+<li><p>system: 监控系统资源，包括CPU、内存和负载</p>
+</li>
+<li><p>program: 监控指定程序的退出代码或者运行时间的长短</p>
+</li>
+<li><p>network: 监控系统指定interface，包括up/down，带宽，误码率，流量，ping</p>
+</li>
+<li><p>host: 监控其它主机，可以定义端口、tcp/udp、protocol（http/mysql/websocket）。protocol为http的时候，还可以进一步定义url和返回内容</p>
+<p>我们的目标是监控主机的web端口，因此用host类型，相应的配置语法为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">check host &lt;service&gt; address &lt;host ip address&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="服务测试"><a href="#服务测试" class="headerlink" title="服务测试"></a>服务测试</h3><p>服务测试提供了测试监控对象状态的一种方法，根据状态不同，可以指定相应的动作</p>
+<p>通用语法为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">if &lt;test&gt; then &lt;aciton1&gt; else if succeeded then &lt;action2&gt;</span><br></pre></td></tr></table></figure>
+
+<p>test有几种类型</p>
+</li>
+</ul>
+<ol>
+<li><p>状态失效，如网络不可达，进程丢失如果失败</p>
+</li>
+<li><p>参数变化，如文件权限，文件md5，文件大小，日期等</p>
+</li>
+<li><p>参数达到门限，如CPU&gt;80%, 磁盘空间大于85%</p>
+<p>当test为真时，则执行action1<br>当从失效状态转到正常状态，则执行action2，这一句是可选项</p>
+<p>action有5种类型</p>
+</li>
+<li><p>alert: 发送告警邮件</p>
+</li>
+<li><p>restart/start/stop: 重启/启动/停止service。在监控进程时特别有用，先定义start、stop、restart的命令，当进程丢失时，启动相应service，恢复进程</p>
+</li>
+<li><p>exec: 执行用户定义的命令或者脚本</p>
+<h3 id="监控web端口"><a href="#监控web端口" class="headerlink" title="监控web端口"></a>监控web端口</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">check host csa35 with address 10.7.83.35</span><br><span class="line">        if failed port 80 protocol http then alert</span><br><span class="line">        if failed port 9080 protocol http then alert</span><br><span class="line">        if failed port 9081 protocol http then alert</span><br></pre></td></tr></table></figure>
+
+<p>这个基本上是自然语言了。相应的业务逻辑为:</p>
+<p>检查主机（check host），服务名称（$SERVICE）为csa35，ip地址为10.7.83.35，如果http 80/9080/9081 失败，则告警</p>
+<p>这里不指定url，默认的url是<code>/</code></p>
+<h3 id="其它的典型例子"><a href="#其它的典型例子" class="headerlink" title="其它的典型例子"></a>其它的典型例子</h3><p>从官网文档上找了一个典型例子，监控apache进程，比较全面展现了monit的能力</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">check process apache with pidfile /var/run/httpd.pid</span><br><span class="line">       start program = &quot;/etc/init.d/httpd start&quot;</span><br><span class="line">       stop program  = &quot;/etc/init.d/httpd stop&quot;</span><br><span class="line">       if cpu &gt; 40% for 2 cycles then alert</span><br><span class="line">       if total cpu &gt; 60% for 2 cycles then alert</span><br><span class="line">       if total cpu &gt; 80% for 5 cycles then restart</span><br><span class="line">       if mem &gt; 100 MB for 5 cycles then stop</span><br><span class="line">       if loadavg(5min) greater than 10.0 for 8 cycles then stop</span><br></pre></td></tr></table></figure>
+
+<p>使用pidfile监控进程，服务名为apache<br>start命令<br>stop命令<br>如果2次轮询，进程cpu都大于40%，则告警<br>如果2次轮询，系统cpu都大于60%，则告警<br>如果5次轮询，系统cpu都大于80%，则重启（先stop，再start）<br>如果5次轮询，内存mem都大于100MB，则stop<br>如果8个次轮询，5分钟平均负载都大于10，则stop</p>
+<h1 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo /etc/init.d/monit start</span><br></pre></td></tr></table></figure>
+
+<h1 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h1><p>tail /var/log/monit.log<br>或者<br>web界面2812端口查看</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/monit/" rel="tag"># monit</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/02/17/cygwin%E4%B8%8B%E5%88%B6%E4%BD%9Ciso%E6%96%87%E4%BB%B6/" rel="prev" title="Cygwin下制作iso文件">
+      <i class="fa fa-chevron-left"></i> Cygwin下制作iso文件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/03/25/%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF%E5%88%B0%E5%BE%AE%E4%BF%A1%E4%BC%81%E4%B8%9A%E5%8F%B7/" rel="next" title="命令行发送消息到微信企业号">
+      命令行发送消息到微信企业号 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#monit"><span class="nav-number">1.</span> <span class="nav-text">monit</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-number">3.</span> <span class="nav-text">配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%9A%84daemon%E9%85%8D%E7%BD%AE"><span class="nav-number">3.1.</span> <span class="nav-text">基本的daemon配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#email%E5%91%8A%E8%AD%A6%E9%85%8D%E7%BD%AE"><span class="nav-number">3.2.</span> <span class="nav-text">email告警配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTPD%E9%85%8D%E7%BD%AE"><span class="nav-number">3.3.</span> <span class="nav-text">HTTPD配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%E6%9C%8D%E5%8A%A1"><span class="nav-number">3.4.</span> <span class="nav-text">定义服务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%B1%BB%E5%9E%8B"><span class="nav-number">3.4.1.</span> <span class="nav-text">服务类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E6%B5%8B%E8%AF%95"><span class="nav-number">3.4.2.</span> <span class="nav-text">服务测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%91%E6%8E%A7web%E7%AB%AF%E5%8F%A3"><span class="nav-number">3.4.3.</span> <span class="nav-text">监控web端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B6%E5%AE%83%E7%9A%84%E5%85%B8%E5%9E%8B%E4%BE%8B%E5%AD%90"><span class="nav-number">3.4.4.</span> <span class="nav-text">其它的典型例子</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8"><span class="nav-number">4.</span> <span class="nav-text">启动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B"><span class="nav-number">5.</span> <span class="nav-text">查看</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

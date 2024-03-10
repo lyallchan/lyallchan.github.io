@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="Win10安装Docker for windows，一般在docker中运行命令行程序。如果要在容器内运行桌面程序，那如何配置呢？">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Win10下使用cygwinX server运行linux容器桌面，并实现中文输入">
+<meta property="og:url" content="http://lyallchan.github.io/2017/02/02/Win10%E4%B8%8B%E4%BD%BF%E7%94%A8cygwinX%20server%E8%BF%90%E8%A1%8Clinux%E5%AE%B9%E5%99%A8%E6%A1%8C%E9%9D%A2%EF%BC%8C%E5%B9%B6%E5%AE%9E%E7%8E%B0%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="Win10安装Docker for windows，一般在docker中运行命令行程序。如果要在容器内运行桌面程序，那如何配置呢？">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-02-02T05:17:05.000Z">
+<meta property="article:modified_time" content="2020-12-13T09:54:54.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="docker">
+<meta property="article:tag" content="desktop">
+<meta property="article:tag" content="中文输入">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2017/02/02/Win10%E4%B8%8B%E4%BD%BF%E7%94%A8cygwinX%20server%E8%BF%90%E8%A1%8Clinux%E5%AE%B9%E5%99%A8%E6%A1%8C%E9%9D%A2%EF%BC%8C%E5%B9%B6%E5%AE%9E%E7%8E%B0%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Win10下使用cygwinX server运行linux容器桌面，并实现中文输入 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2017/02/02/Win10%E4%B8%8B%E4%BD%BF%E7%94%A8cygwinX%20server%E8%BF%90%E8%A1%8Clinux%E5%AE%B9%E5%99%A8%E6%A1%8C%E9%9D%A2%EF%BC%8C%E5%B9%B6%E5%AE%9E%E7%8E%B0%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Win10下使用cygwinX server运行linux容器桌面，并实现中文输入
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-02-02 13:17:05" itemprop="dateCreated datePublished" datetime="2017-02-02T13:17:05+08:00">2017-02-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 17:54:54" itemprop="dateModified" datetime="2020-12-13T17:54:54+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>Win10安装Docker for windows，一般在docker中运行命令行程序。如果要在容器内运行桌面程序，那如何配置呢？</p>
+<span id="more"></span>
+
+<p><a href="hub.docker.com">hub.docker.com</a>上搜索了一下，大多数在容器内安装桌面环境以及VNC Server或者Xpra，然后在Windows中安装VNC客户端或者Xpra，连接到容器，实现容器的桌面应用。</p>
+<p>实际上也可以使用X11方案：在windows上运行Xserver，容器内运行Xclient。下面配置使用cygwinX实现windows的Xserver，容器内安装桌面程序，做为Xclient，连接至windows的X server。</p>
+<h1 id="安装cygwinX"><a href="#安装cygwinX" class="headerlink" title="安装cygwinX"></a>安装cygwinX</h1><p>运行cygwin的setup，选择xorg-server和xinit，一路next，完成安装。启动命令是</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">startxwin</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://x.cygwin.com/">cygwinX</a>在1.7版本之后，因为安全原因，默认不再监听TCP端口，只监听socket端口。也就是只能运行本地X client，或者通过ssh运行远程的X client。</p>
+<p>也有<a target="_blank" rel="noopener" href="https://linux.cn/article-5579-1.html">资料</a>说明，mac上安装x server，容器运行时可以映射mac的/tmp/.X11-unix到容器内的/tmp/.X11-unix，实现容器内运行桌面环境，显示在mac的x server上。但是在cgywinX和docker for windows环境下，实验不成功。</p>
+<p>在容器内安装ssh server比较麻烦，这里就启用cygwinX的TCP功能，通过TCP连接容器。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">startxwin -- -listen tcp</span><br><span class="line">xhost +  </span><br></pre></td></tr></table></figure>
+
+<p>启动xwin，并关闭xhost的access control，使得任意IP的x client都能连上xwin。</p>
+<p>startxwin默认启动xwin multiwindow模式，这样就在windows上启动了一个X server，默认的端口为:0.0</p>
+<h1 id="容器内运行单个GUI程序"><a href="#容器内运行单个GUI程序" class="headerlink" title="容器内运行单个GUI程序"></a>容器内运行单个GUI程序</h1><p>比如运行一个firefox。按照普通方法安装firefox，配置好中文字体。</p>
+<p>dockerfile</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">FROM ubuntu:16.04</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">RUN apt-get update &amp;&amp; apt-get -y install firefox</span><br><span class="line"></span><br><span class="line">RUN apt-get install -y language-pack-zh-hans</span><br><span class="line">RUN mkdir /usr/share/fonts/win</span><br><span class="line">ADD simsun.ttc /usr/share/fonts/win/</span><br><span class="line">ADD simhei.ttf /usr/share/fonts/win/</span><br><span class="line">RUN mkfontscale &amp;&amp; mkfontdir &amp;&amp; fc-cache -fv</span><br><span class="line"></span><br><span class="line">RUN apt-get autoclean &amp;&amp; apt-get autoremove</span><br></pre></td></tr></table></figure>
+
+<p>运行的时候，指定DISPLAY环境变量到windows的X server端口。即</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line">    -e DISPLAY=10.0.75.1:0.0 \</span><br><span class="line">    --rm \</span><br><span class="line">    -it \</span><br><span class="line">    --name firefox \</span><br><span class="line">    --hostname firefox \</span><br><span class="line">    firefox:latest \</span><br><span class="line">    firefox</span><br></pre></td></tr></table></figure>
+
+<p>10.0.75.1是windows的一个IP地址，是docker的网桥网关。</p>
+<p>这种方法的优点在于不需要在容器内安装桌面，只要安装应用程序，桌面管理由cygwinX完成，生成的镜像小，配置简单。</p>
+<p>运行的时候，firefox好像是本地windows的一个应用，有windows的标题栏等等，实际却在容器内运行。</p>
+<h1 id="运行容器内桌面，实现中文输入"><a href="#运行容器内桌面，实现中文输入" class="headerlink" title="运行容器内桌面，实现中文输入"></a>运行容器内桌面，实现中文输入</h1><p>上面的运行方式有个问题，能显示中文，却无法输入中文。查了很多资料也找不到只安装GUI程序和输入法的情况下，正确的输入中文。</p>
+<p>那么尝试在容器内安装桌面环境。</p>
+<h2 id="修改startxwin"><a href="#修改startxwin" class="headerlink" title="修改startxwin"></a>修改startxwin</h2><p>xwin有<a target="_blank" rel="noopener" href="https://x.cygwin.com/docs/man1/XWin.1.html">三种运行模式</a>，singlewindow，multiwindow和rootless。</p>
+<ul>
+<li>singlewindow模式：xwin使用远程桌面管理器，管理所有的远程X应用，在本地只显示一个窗口</li>
+<li>multiwindow模式：xwin使用内置的桌面管理器，远程每个X应用都拥有一个独立窗口，好像是本地应用一样。上面的运行方式就是这个方式</li>
+<li>rootless模式：基本是singlewindow，不过在没有远程桌面连接时，隐藏xserver的root窗口，也就是不显示xserver的窗口。</li>
+</ul>
+<p>要在容器内运行桌面，需要使xwin运行在singlewindow或者rootless模式，需要修改startxwin。multiwindow也可以运行，但是显示比较奇怪。</p>
+<p>startxwin是一个shell程序，很容易找到xwin的serverargs</p>
+<p>vi /usr/bin/startxwin</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># commeted by lyallchan, uncommet to return default behavier</span><br><span class="line"># serverargs=&quot;-multiwindow $serverargs&quot;</span><br><span class="line">###</span><br><span class="line">serverargs=&quot;-listen tcp -rootless $serverargs&quot;</span><br></pre></td></tr></table></figure>
+
+<p>startxwin默认启动xwin的multiwindow模式，修改startxwin，使得xwin监听TCP端口，运行在rootless模式。</p>
+<h2 id="容器内安装桌面和中文输入法"><a href="#容器内安装桌面和中文输入法" class="headerlink" title="容器内安装桌面和中文输入法"></a>容器内安装桌面和中文输入法</h2><p>选来选去，桌面安装xfce4，中文输入法安装fcitx和fcitx-pinyin。</p>
+<p>dockerfile</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">FROM ubuntu:16.04</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV DEBIAN_FRONTEND noninteractive</span><br><span class="line">ENV GTK_IM_MODULE fcitx</span><br><span class="line">ENV QT_IM_MODULE fcitx</span><br><span class="line">ENV XMODIFIERS &quot;@im=fcitx&quot;</span><br><span class="line">ENV LC_CTYPE zh_CN.UTF-8</span><br><span class="line"></span><br><span class="line">RUN apt-get update &amp;&amp; apt-get -y install firefox</span><br><span class="line"></span><br><span class="line">RUN apt-get install -y language-pack-zh-hans</span><br><span class="line">RUN mkdir /usr/share/fonts/win</span><br><span class="line">ADD simsun.ttc /usr/share/fonts/win/</span><br><span class="line">ADD simhei.ttf /usr/share/fonts/win/</span><br><span class="line">RUN mkfontscale &amp;&amp; mkfontdir &amp;&amp; fc-cache -fv</span><br><span class="line"></span><br><span class="line">RUN apt-get install -y xfce4 xfce4-terminal</span><br><span class="line">RUN apt-get install -y fcitx fcitx-pinyin</span><br><span class="line"></span><br><span class="line">RUN mkdir -p /root/.config/fcitx</span><br><span class="line">RUN echo [Hotkey] &gt; /root/.config/fcitx/config</span><br><span class="line">RUN echo TriggerKey=CTRL_ALT_SPACE &gt;&gt; /root/.config/fcitx/config</span><br><span class="line">RUN echo SwitchKey=Disabled &gt;&gt; /root/.config/fcitx/config</span><br><span class="line">RUN echo IMSwitchKey=False &gt;&gt; /root/.config/fcitx/config</span><br><span class="line"></span><br><span class="line">RUN apt-get autoclean &amp;&amp; apt-get autoremove</span><br></pre></td></tr></table></figure>
+
+<p>apt-get xfce4的时候，会和用户交互，导致build失败，要设置成noninteractive模式。</p>
+<p>安装好输入法之后，要设置3个<a target="_blank" rel="noopener" href="https://fcitx-im.org/wiki/Input_method_related_environment_variables">环境变量</a>，使系统默认启用fcitx输入框架。</p>
+<p>配置fcitx的输入法切换键为CTRL_ALT_SPACE，以避免和windows的输入法快捷键冲突。</p>
+<h2 id="运行容器"><a href="#运行容器" class="headerlink" title="运行容器"></a>运行容器</h2><p>运行比较复杂，写个脚本简化操作。</p>
+<p>判断xwin是否运行，如果不运行，在tmux中启动xwin，不在后台启动xwin，可以避免屏幕混乱。</p>
+<p>关闭xhost的access control，使得任意IP的x client都能连上xwin。</p>
+<p>启动容器，并启动fcitx和xfce4。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash </span><br><span class="line"></span><br><span class="line">D=10.0.75.1:0.0</span><br><span class="line"></span><br><span class="line">if ! ps | grep xinit ; then</span><br><span class="line">    tmux new-session -d -s xwin startxwin</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">xhost + </span><br><span class="line"></span><br><span class="line">winpty \</span><br><span class="line">    docker  run \</span><br><span class="line">    -e DISPLAY=$D \</span><br><span class="line">    --rm \</span><br><span class="line">    -it \</span><br><span class="line">    --name=firefox \</span><br><span class="line">    --hostname=firefox \</span><br><span class="line">    firefox:on \</span><br><span class="line">    bash -c &quot;fcitx; startxfce4&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><p>hub.docker.com上的桌面镜像</p>
+<p> <a target="_blank" rel="noopener" href="https://hub.docker.com/r/queeno/ubuntu-desktop/">https://hub.docker.com/r/queeno/ubuntu-desktop/</a><br> <a target="_blank" rel="noopener" href="https://hub.docker.com/r/rogaha/docker-desktop/">https://hub.docker.com/r/rogaha/docker-desktop/</a><br> <a target="_blank" rel="noopener" href="https://hub.docker.com/r/sevnew/ubuntu-xfce-vnc-desktop-chrome/">https://hub.docker.com/r/sevnew/ubuntu-xfce-vnc-desktop-chrome/</a></p>
+</li>
+<li><p>cygwinX1.7之后，不再监听TCP端口</p>
+<p> <a target="_blank" rel="noopener" href="https://x.cygwin.com/docs/faq/cygwin-x-faq.html#q-xserver-nolisten-tcp-default">https://x.cygwin.com/docs/faq/cygwin-x-faq.html#q-xserver-nolisten-tcp-default</a></p>
+</li>
+<li><p>MAC下运行桌面容器</p>
+<p> <a target="_blank" rel="noopener" href="https://linux.cn/article-5579-1.html">https://linux.cn/article-5579-1.html</a></p>
+</li>
+<li><p>ubuntu安装宋体</p>
+<p> <a target="_blank" rel="noopener" href="http://www.2cto.com/os/201308/239373.html">http://www.2cto.com/os/201308/239373.html</a></p>
+</li>
+<li><p>xwin的man文档，详细说明了xwin的三种运行模式</p>
+<p> <a target="_blank" rel="noopener" href="https://x.cygwin.com/docs/man1/XWin.1.html">https://x.cygwin.com/docs/man1/XWin.1.html</a></p>
+</li>
+<li><p>fcitx的环境变量设置</p>
+<p> <a target="_blank" rel="noopener" href="https://fcitx-im.org/wiki/Input_method_related_environment_variables">https://fcitx-im.org/wiki/Input_method_related_environment_variables</a><br> <a target="_blank" rel="noopener" href="https://wiki.archlinux.org/index.php/Fcitx">https://wiki.archlinux.org/index.php/Fcitx</a></p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+              <a href="/tags/desktop/" rel="tag"># desktop</a>
+              <a href="/tags/%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/" rel="tag"># 中文输入</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/01/17/%E5%BB%BA%E7%AB%8B%E4%BC%AA%E5%88%86%E5%B8%83%E5%BC%8Fhbase%E9%9B%86%E7%BE%A4/" rel="prev" title="建立伪分布式hbase集群">
+      <i class="fa fa-chevron-left"></i> 建立伪分布式hbase集群
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/02/04/%E5%AE%B9%E5%99%A8%E5%8C%96Hbase%E5%92%8Csquirrel/" rel="next" title="容器化Hbase standalone、Phoenix和Squirrel">
+      容器化Hbase standalone、Phoenix和Squirrel <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85cygwinX"><span class="nav-number">1.</span> <span class="nav-text">安装cygwinX</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E5%86%85%E8%BF%90%E8%A1%8C%E5%8D%95%E4%B8%AAGUI%E7%A8%8B%E5%BA%8F"><span class="nav-number">2.</span> <span class="nav-text">容器内运行单个GUI程序</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8%E5%86%85%E6%A1%8C%E9%9D%A2%EF%BC%8C%E5%AE%9E%E7%8E%B0%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5"><span class="nav-number">3.</span> <span class="nav-text">运行容器内桌面，实现中文输入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9startxwin"><span class="nav-number">3.1.</span> <span class="nav-text">修改startxwin</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%B9%E5%99%A8%E5%86%85%E5%AE%89%E8%A3%85%E6%A1%8C%E9%9D%A2%E5%92%8C%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5%E6%B3%95"><span class="nav-number">3.2.</span> <span class="nav-text">容器内安装桌面和中文输入法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E5%AE%B9%E5%99%A8"><span class="nav-number">3.3.</span> <span class="nav-text">运行容器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

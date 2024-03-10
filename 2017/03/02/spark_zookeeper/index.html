@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="安装spark集群，3master，2slaves，master通过zookeeper管理，5个机器全部容器化。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SPARK standalone HA with Zookeeper in docker">
+<meta property="og:url" content="http://lyallchan.github.io/2017/03/02/spark_zookeeper/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="安装spark集群，3master，2slaves，master通过zookeeper管理，5个机器全部容器化。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-03-01T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-12-13T11:24:40.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="docker">
+<meta property="article:tag" content="spark">
+<meta property="article:tag" content="zookeeper">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2017/03/02/spark_zookeeper/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SPARK standalone HA with Zookeeper in docker | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2017/03/02/spark_zookeeper/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SPARK standalone HA with Zookeeper in docker
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-03-02 00:00:00" itemprop="dateCreated datePublished" datetime="2017-03-02T00:00:00+08:00">2017-03-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 19:24:40" itemprop="dateModified" datetime="2020-12-13T19:24:40+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>安装spark集群，3master，2slaves，master通过zookeeper管理，5个机器全部容器化。</p>
+<span id="more"></span>
+
+<p>关于slave还是worker：官方文档叫做worker，但是配置文件却是slave，所以还是用slaves，和配置文件统一</p>
+<h1 id="制作镜像"><a href="#制作镜像" class="headerlink" title="制作镜像"></a>制作镜像</h1><h2 id="dockerfile"><a href="#dockerfile" class="headerlink" title="dockerfile"></a>dockerfile</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"># Creates standalone spark cluster</span><br><span class="line"></span><br><span class="line">FROM java:on</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV SPARK=&quot;spark-2.1.0-bin-hadoop2.6&quot;</span><br><span class="line">ADD http://127.0.0.1:60060/$SPARK.tgz /</span><br><span class="line">RUN tar -xf /$SPARK.tgz \</span><br><span class="line">        &amp;&amp; ln -s /$SPARK /spark \</span><br><span class="line">        &amp;&amp; rm /$SPARK.tgz</span><br><span class="line">ENV PATH /spark/sbin:/spark/bin:$PATH</span><br><span class="line"></span><br><span class="line">ENV ZOOKEEPER=&quot;zookeeper-3.4.9&quot;</span><br><span class="line">ADD http://127.0.0.1:60060/$ZOOKEEPER.tar.gz /</span><br><span class="line">RUN tar -xf /$ZOOKEEPER.tar.gz \</span><br><span class="line">        &amp;&amp; ln -s /$ZOOKEEPER /zookeeper \</span><br><span class="line">        &amp;&amp; rm /$ZOOKEEPER.tar.gz</span><br><span class="line">RUN mv /zookeeper/conf/zoo_sample.cfg /zookeeper/conf/zoo.cfg</span><br><span class="line">ENV PATH /zookeeper/bin:$PATH</span><br><span class="line"></span><br><span class="line">ENV CONDA=&quot;Miniconda2-latest-Linux-x86_64.sh&quot;</span><br><span class="line">ADD http://127.0.0.1:60060/$CONDA /</span><br><span class="line">RUN bash /$CONDA -b -p conda</span><br><span class="line">RUN rm /$CONDA</span><br><span class="line">ENV PATH /conda/bin:$PATH</span><br><span class="line">ENV PYSPARK_PYTHON=/conda/bin/python</span><br><span class="line">RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ \</span><br><span class="line">    &amp;&amp; conda config --set show_channel_urls yes</span><br><span class="line">RUN conda install numpy -y</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><code>java:on</code>是自定义容器，安装了<code>oracle java8</code>，增加了免密码<code>ssh</code>登陆功能</p>
+<p>第1段：下载<a target="_blank" rel="noopener" href="http://spark.apache.org/downloads.html"><code>spark</code></a>包，解压缩到根目录，设置PATH变量</p>
+<p>第2段：下载<a target="_blank" rel="noopener" href="http://zookeeper.apache.org/releases.html"><code>zookeeper</code></a>包，解压缩到根目录，生成配置文件，设置PATH变量</p>
+<p>第3段：下载安装<a target="_blank" rel="noopener" href="https://conda.io/miniconda.html"><code>conda</code></a>，设置PATH变量。设置PYSPARK_PYTHON变量，使得spark能找到python的运行环境。换源并安装numpy包，也可以安装其它需要的包，如pandas，ipython等</p>
+<p>为了加快下载速度，在本机上运行了一个文件服务器，从文件服务器上下载所需要的安装包。</p>
+<p>文件服务器采用<a target="_blank" rel="noopener" href="https://caddyserver.com/docs/cli"><code>caddy</code></a>，支持http2的web server，也是一个神器，golang编写，单文件运行，一行命令搞定文件服务器。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">caddy -port 60060 -log stdout browse</span><br></pre></td></tr></table></figure>
+
+<h2 id="制作镜像-1"><a href="#制作镜像-1" class="headerlink" title="制作镜像"></a>制作镜像</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build --force-rm -t spark . </span><br></pre></td></tr></table></figure>
+
+<p>总结一下，镜像具有以下环境：</p>
+<ol>
+<li>spark，默认配置文件，在运行时候修改</li>
+<li>zookeeper，拷贝样例配置文件，其中的配置信息在运行时候修改</li>
+<li>conda，换源以及安装所需要的包</li>
+<li>配置PYSPARK_PYTHON，使得spark能找到python运行环境</li>
+</ol>
+<h1 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h1><p>启动文件<code>start.sh</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line"></span><br><span class="line">DIR=`dirname $0`</span><br><span class="line">DATA=`cygpath -aw $DIR/data`</span><br><span class="line">NETWORK=&quot;spark&quot;</span><br><span class="line">CONTAINER=&quot;spark&quot;</span><br><span class="line">S_NUM=2 # slaves number </span><br><span class="line">M_NUM=3 # masters number </span><br><span class="line"></span><br><span class="line">. $DIR/stop.sh  # stop first</span><br><span class="line"></span><br><span class="line">if ! docker network ls | grep $NETWORK &gt;&gt;/dev/null; then</span><br><span class="line">    docker network create &quot;$NETWORK&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"># start master containers...</span><br><span class="line">echo </span><br><span class="line">echo starting master containers...</span><br><span class="line">for i in `seq $M_NUM`; do</span><br><span class="line">    docker run \</span><br><span class="line">        --volume &quot;$DATA&quot;:/v \</span><br><span class="line">        -p 808$i:8080 \</span><br><span class="line">        -d \</span><br><span class="line">        --hostname $&#123;CONTAINER&#125;$i \</span><br><span class="line">        --name $&#123;CONTAINER&#125;$i \</span><br><span class="line">        --net $NETWORK \</span><br><span class="line">        spark \</span><br><span class="line">        /bin/bash -c &quot;/etc/init.d/ssh start &amp;&amp; sleep 99999999&quot;</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line"># start spark slave containers...</span><br><span class="line">echo </span><br><span class="line">echo starting slave containers...</span><br><span class="line">for i in `seq 1 $S_NUM`;do </span><br><span class="line"></span><br><span class="line">    # start si</span><br><span class="line">    docker run \</span><br><span class="line">        --volume &quot;$DATA&quot;:/v \</span><br><span class="line">        -p 809$i:8081 \</span><br><span class="line">        -d \</span><br><span class="line">        --hostname $&#123;CONTAINER&#125;_s$i\</span><br><span class="line">        --name $&#123;CONTAINER&#125;_s$i \</span><br><span class="line">        --net $NETWORK \</span><br><span class="line">        spark \</span><br><span class="line">        /bin/bash -c &quot;/etc/init.d/ssh start &amp;&amp; sleep 99999999&quot;</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line"># start zookeeper in masters</span><br><span class="line">echo</span><br><span class="line">echo starting zookeeper in masters</span><br><span class="line">ZOOKEEPER_DATADIR=&quot;/zookeeper/data&quot;</span><br><span class="line">for i in `seq 1 $M_NUM`; do</span><br><span class="line"></span><br><span class="line">    #/zoo.cfg specially for server:1=xxxxx</span><br><span class="line">    for j in `seq $M_NUM`; do</span><br><span class="line">        docker exec $&#123;CONTAINER&#125;$i /bin/bash -c &quot;echo server.$j=$&#123;CONTAINER&#125;$j:2888:3888 &gt;&gt; /zookeeper/conf/zoo.cfg&quot;</span><br><span class="line">    done</span><br><span class="line">    docker exec $&#123;CONTAINER&#125;$i /bin/bash -c &quot;echo dataDir=$ZOOKEEPER_DATADIR &gt;&gt; /zookeeper/conf/zoo.cfg&quot;</span><br><span class="line">    docker exec $&#123;CONTAINER&#125;$i /bin/bash -c &quot;mkdir -p $ZOOKEEPER_DATADIR&quot;</span><br><span class="line">    docker exec $&#123;CONTAINER&#125;$i /bin/bash -c &quot;echo $i &gt; $ZOOKEEPER_DATADIR/myid&quot;</span><br><span class="line"></span><br><span class="line">    docker exec $&#123;CONTAINER&#125;$i /zookeeper/bin/zkServer.sh start</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line"># start masters</span><br><span class="line">echo </span><br><span class="line">echo starting masters...</span><br><span class="line"># spark.depoly.zookeeper.url in /spark/conf/spark-env.sh</span><br><span class="line">ZOOKEEPER_URL=$&#123;CONTAINER&#125;1:2181</span><br><span class="line">for i in `seq 2 $M_NUM`; do</span><br><span class="line">    ZOOKEEPER_URL=$ZOOKEEPER_URL&quot;,$&#123;CONTAINER&#125;$i:2181&quot;</span><br><span class="line">done</span><br><span class="line">SPARK_DAEMON_JAVA_OPTS=&quot;-Dspark.deploy.recoveryMode=ZOOKEEPER&quot;</span><br><span class="line">SPARK_DAEMON_JAVA_OPTS=&quot;$SPARK_DAEMON_JAVA_OPTS -Dspark.deploy.zookeeper.url=$ZOOKEEPER_URL&quot;</span><br><span class="line"></span><br><span class="line">for i in `seq 1 $M_NUM`; do</span><br><span class="line">    # /spark/conf/slaves</span><br><span class="line">    for j in `seq 1 $S_NUM`; do</span><br><span class="line">        docker exec $&#123;CONTAINER&#125;$i /bin/bash -c &quot;echo $&#123;CONTAINER&#125;_s$j &gt;&gt; /spark/conf/slaves&quot;</span><br><span class="line">    done</span><br><span class="line">    # spark-env.sh with SPARK_DAEMON_JAVA_OPTS</span><br><span class="line">    docker exec $&#123;CONTAINER&#125;$i /bin/bash -c &quot;echo SPARK_DAEMON_JAVA_OPTS=&#x27;\&quot;$SPARK_DAEMON_JAVA_OPTS\&quot; &#x27;&gt;&gt; /spark/conf/spark-env.sh&quot;</span><br><span class="line"></span><br><span class="line">    docker exec $&#123;CONTAINER&#125;$i /spark/sbin/start-master.sh</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line"># start slaves</span><br><span class="line">echo</span><br><span class="line">echo starting slaves...</span><br><span class="line"># SPARK_SLAVES_SC for start-slave.sh parameter</span><br><span class="line">SPARK_SLAVES_SC=&quot;spark://$&#123;CONTAINER&#125;1:7077&quot;</span><br><span class="line">for i in `seq 2 $M_NUM`; do</span><br><span class="line">    SPARK_SLAVES_SC=$&#123;SPARK_SLAVES_SC&#125;&quot;,$&#123;CONTAINER&#125;$i:7077&quot;</span><br><span class="line">done</span><br><span class="line">for i in `seq 1 $S_NUM`; do</span><br><span class="line">    docker exec $&#123;CONTAINER&#125;_s$i /spark/sbin/start-slave.sh $SPARK_SLAVES_SC</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">echo</span><br><span class="line">echo done!</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>第1,2,3段准备变量，包括容器映射目录，容器网络，容器名称，slave数量2个，master数量3个。停止已经运行的容器，创建容器网络。</p>
+<blockquote>
+<p>docker新版本的容器网络功能强大，在同一个网络下的各个容器可以通过hostname互通，不再需要link</p>
+</blockquote>
+<p>第4、5段分别启动<code>master</code>、<code>slave</code>容器，现阶段只启动<code>sshd</code>服务，各主机名和暴露端口如下</p>
+<table>
+<thead>
+<tr>
+<th>主机名</th>
+<th>端口</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>spark1</td>
+<td>8081</td>
+<td>master</td>
+</tr>
+<tr>
+<td>spark2</td>
+<td>8082</td>
+<td>master</td>
+</tr>
+<tr>
+<td>spark3</td>
+<td>8083</td>
+<td>master</td>
+</tr>
+<tr>
+<td>spark_s1</td>
+<td>8091</td>
+<td>slave</td>
+</tr>
+<tr>
+<td>spark_s2</td>
+<td>8092</td>
+<td>slave</td>
+</tr>
+</tbody></table>
+<h2 id="启动zookeeper"><a href="#启动zookeeper" class="headerlink" title="启动zookeeper"></a>启动zookeeper</h2><p>第6段，在3台<code>master</code>中启动<code>zookeeper</code>服务</p>
+<p><code>conf/zoo.cfg</code>增加配置</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">server.1=spark1:2888:3888</span><br><span class="line">server.2=spark2:2888:3888</span><br><span class="line">server.3=spark3:2888:3888</span><br><span class="line">dataDir=/zookeeper/data</span><br></pre></td></tr></table></figure>
+
+<p>在<code>dataDir</code>下增加<code>myid</code>文件，即增加<code>/zookeeper/data/myid</code>文件，3个容器内容不同，分别为1,2,3，标识<code>zookeeper</code>选举顺序</p>
+<p><code>zkServer.sh start</code>启动服务</p>
+<h2 id="启动spark-master服务"><a href="#启动spark-master服务" class="headerlink" title="启动spark master服务"></a>启动spark master服务</h2><p>第7段，在3台<code>master</code>中启动<code>spark master</code>服务</p>
+<p>增加<code>conf/slaves</code>文件，指定各<code>slave</code>主机名</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">spark_s1</span><br><span class="line">spark_s2</span><br></pre></td></tr></table></figure>
+
+<p>增加<code>conf/spark-env.sh</code>，设置<code>spark-master</code>启动参数，参数指定HA模式为<code>zookeeper</code>模式，并指向<code>zookeeper</code>服务参数</p>
+<p><strong>这部分内容在官方文档中没有详细描述</strong>，可以参考<a target="_blank" rel="noopener" href="http://blog.csdn.net/anzhsoft/article/details/33740737">网上资料</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SPARK_DAEMON_JAVA_OPTS=&quot;-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.url=spark1:2181,spark2:2181,spark3:2181&quot;</span><br></pre></td></tr></table></figure>
+
+<p><code>start-master.sh</code>启动服务</p>
+<h2 id="启动spark-slave服务"><a href="#启动spark-slave服务" class="headerlink" title="启动spark slave服务"></a>启动spark slave服务</h2><p>通过命令行参数指定<code>spark master</code>集群</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/spark/sbin/start-slave.sh spark://spark1:7077,spark2:7077,spark3:7077</span><br></pre></td></tr></table></figure>
+
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><p>zookeeper模式下，spark master启动参数设置</p>
+<p> <a target="_blank" rel="noopener" href="http://www.dataguru.cn/thread-333245-1-1.html">http://www.dataguru.cn/thread-333245-1-1.html</a><br> <a target="_blank" rel="noopener" href="http://blog.csdn.net/anzhsoft/article/details/33740737">http://blog.csdn.net/anzhsoft/article/details/33740737</a></p>
+</li>
+<li><p>spark官方文档有关HA配置</p>
+<p> <a target="_blank" rel="noopener" href="http://spark.apache.org/docs/latest/spark-standalone.html">http://spark.apache.org/docs/latest/spark-standalone.html</a></p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+              <a href="/tags/spark/" rel="tag"># spark</a>
+              <a href="/tags/zookeeper/" rel="tag"># zookeeper</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/02/19/Keepass%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" rel="prev" title="Keepass使用记录">
+      <i class="fa fa-chevron-left"></i> Keepass使用记录
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/03/03/spark_jupyter/" rel="next" title="使用jupyter notebook做为spark客户端">
+      使用jupyter notebook做为spark客户端 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%B6%E4%BD%9C%E9%95%9C%E5%83%8F"><span class="nav-number">1.</span> <span class="nav-text">制作镜像</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#dockerfile"><span class="nav-number">1.1.</span> <span class="nav-text">dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%B6%E4%BD%9C%E9%95%9C%E5%83%8F-1"><span class="nav-number">1.2.</span> <span class="nav-text">制作镜像</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C"><span class="nav-number">2.</span> <span class="nav-text">运行</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8zookeeper"><span class="nav-number">2.1.</span> <span class="nav-text">启动zookeeper</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8spark-master%E6%9C%8D%E5%8A%A1"><span class="nav-number">2.2.</span> <span class="nav-text">启动spark master服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8spark-slave%E6%9C%8D%E5%8A%A1"><span class="nav-number">2.3.</span> <span class="nav-text">启动spark slave服务</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

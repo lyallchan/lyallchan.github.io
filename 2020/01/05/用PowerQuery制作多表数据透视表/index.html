@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="背景在EXCEL中基于一张Sheet制作数据透视表是现代人的基本功，那么如何进行多Sheet的数据透视表呢？网上的教程有很多，最灵活的是使用强大的PowerQuery进行数据整合，整合成一张表后再制作数据透视表。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用PowerQuery制作多表数据透视表">
+<meta property="og:url" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="背景在EXCEL中基于一张Sheet制作数据透视表是现代人的基本功，那么如何进行多Sheet的数据透视表呢？网上的教程有很多，最灵活的是使用强大的PowerQuery进行数据整合，整合成一张表后再制作数据透视表。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-11-16-51.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-11-28-29.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-15-57.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-16-22.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-23-26.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-26-35.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-27-14.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-30-24.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-13-21-48.png">
+<meta property="og:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-13-13-46.png">
+<meta property="article:published_time" content="2020-01-05T03:08:00.000Z">
+<meta property="article:modified_time" content="2020-12-13T11:53:26.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="PowerQuery">
+<meta property="article:tag" content="数据透视表">
+<meta property="article:tag" content="相对路径">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-11-16-51.png">
+
+<link rel="canonical" href="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>用PowerQuery制作多表数据透视表 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          用PowerQuery制作多表数据透视表
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-01-05 11:08:00" itemprop="dateCreated datePublished" datetime="2020-01-05T11:08:00+08:00">2020-01-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 19:53:26" itemprop="dateModified" datetime="2020-12-13T19:53:26+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>在EXCEL中基于一张Sheet制作数据透视表是现代人的基本功，那么如何进行多Sheet的数据透视表呢？网上的教程有很多，最灵活的是使用强大的PowerQuery进行数据整合，整合成一张表后再制作数据透视表。</p>
+<span id="more"></span>
+
+<p>使用PowerQuery进行基于EXCEL的数据整合，一般都是用<img src="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-11-16-51.png" class="">选择一个EXCEL文件，实际上是用一个外部EXCEL文件做为PowerQuery数据源，使用了文件的绝对路径，移动了这个EXCEL文件，PowerQuery就会报错。如果要整合同一个EXCEL文件中多个Sheet，就会显得很奇怪：明明只有一个文件，这个文件有源数据，有整合好的数据，有数据透视表，但是却不能移动位置，否则就会出错。</p>
+<p>需要通过相对路径访问外部数据源，或者直接使用内部Sheet。</p>
+<h1 id="PowerQuery使用内部Sheet的思路"><a href="#PowerQuery使用内部Sheet的思路" class="headerlink" title="PowerQuery使用内部Sheet的思路"></a>PowerQuery使用内部Sheet的思路</h1><p>EXCEL<code>数据-获取数据-自其它源-自表格区域</code>可以直接访问EXCEL的表（TABLE）和区域，<img src="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-11-28-29.png" class="">，所以我们可以先将数据创建表，再将创建的表引入PowerQuery，进行数据整理，整理好的数据再上载回EXCEL。</p>
+<h1 id="PowerQuery使用内部Sheet的具体过程"><a href="#PowerQuery使用内部Sheet的具体过程" class="headerlink" title="PowerQuery使用内部Sheet的具体过程"></a>PowerQuery使用内部Sheet的具体过程</h1><h2 id="准备数据"><a href="#准备数据" class="headerlink" title="准备数据"></a>准备数据</h2><p>2011年南区北区的销售数据和2017年东南西北区的销售数据</p>
+<img src="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-15-57.png" class="">
+<img src="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-16-22.png" class="">
+
+<p>现在要求使用PowerQuery将2011年和2017年南区北区销售数据整合在一张表中</p>
+<h2 id="生成TABLE，命名为-2011和-2017"><a href="#生成TABLE，命名为-2011和-2017" class="headerlink" title="生成TABLE，命名为_2011和_2017"></a>生成TABLE，命名为_2011和_2017</h2><p><code>插入-表格</code>，将表格分别命名为_2011和_2017</p>
+<p>顺便说一句，使用表格是EXCEL中结构化数据的起点，大家应该多用。</p>
+<h2 id="PowerQuery生成查询"><a href="#PowerQuery生成查询" class="headerlink" title="PowerQuery生成查询"></a>PowerQuery生成查询</h2><p>选中表_2011，然后<code>数据-获取数据-自其它源-自表格区域</code>打开PowerQuery，<img src="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-23-26.png" class=""> </p>
+<p>同样操作_2017，_2017多了两列，要将这两列去除，也是在PowerQuery中操作，如下图。</p>
+<img src="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-26-35.png" class=""> 
+<img src="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-27-14.png" class=""> 
+
+<h2 id="两个查询合并"><a href="#两个查询合并" class="headerlink" title="两个查询合并"></a>两个查询合并</h2><p>将两个查询合二为一。这里只是简单的行拼接，所以使用追加查询。 <img src="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-12-30-24.png" class=""> </p>
+<img src="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-13-21-48.png" class="">
+
+<p>新生成的查询命令为Total，使用创建新表的方式上载回EXCEL。这样就完成了数据整理。</p>
+<img src="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/2020-01-05-13-13-46.png" class="">
+
+<p>当源数据改变的时候，包括增删减数据，合并好的数据也会自动更新，十分好用。</p>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>第一次写多图的文章，也是第一次写基于GUI操作的文章，算是一个新的开端。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/PowerQuery/" rel="tag"># PowerQuery</a>
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/" rel="tag"># 数据透视表</a>
+              <a href="/tags/%E7%9B%B8%E5%AF%B9%E8%B7%AF%E5%BE%84/" rel="tag"># 相对路径</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/" rel="prev" title="Powershell调用Outlook的SendUsingAccount无效的解决方法">
+      <i class="fa fa-chevron-left"></i> Powershell调用Outlook的SendUsingAccount无效的解决方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/" rel="next" title="Excel汇总整个文件夹数据">
+      Excel汇总整个文件夹数据 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PowerQuery%E4%BD%BF%E7%94%A8%E5%86%85%E9%83%A8Sheet%E7%9A%84%E6%80%9D%E8%B7%AF"><span class="nav-number">2.</span> <span class="nav-text">PowerQuery使用内部Sheet的思路</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PowerQuery%E4%BD%BF%E7%94%A8%E5%86%85%E9%83%A8Sheet%E7%9A%84%E5%85%B7%E4%BD%93%E8%BF%87%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">PowerQuery使用内部Sheet的具体过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E6%95%B0%E6%8D%AE"><span class="nav-number">3.1.</span> <span class="nav-text">准备数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%94%9F%E6%88%90TABLE%EF%BC%8C%E5%91%BD%E5%90%8D%E4%B8%BA-2011%E5%92%8C-2017"><span class="nav-number">3.2.</span> <span class="nav-text">生成TABLE，命名为_2011和_2017</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PowerQuery%E7%94%9F%E6%88%90%E6%9F%A5%E8%AF%A2"><span class="nav-number">3.3.</span> <span class="nav-text">PowerQuery生成查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%A4%E4%B8%AA%E6%9F%A5%E8%AF%A2%E5%90%88%E5%B9%B6"><span class="nav-number">3.4.</span> <span class="nav-text">两个查询合并</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%8E%E8%AE%B0"><span class="nav-number">4.</span> <span class="nav-text">后记</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="建立hadoop和hbase的伪分布式集群，hadoop和hbase分别运行在两个容器内，通过hadoop:9000端口访问。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="建立伪分布式hbase集群">
+<meta property="og:url" content="http://lyallchan.github.io/2017/01/17/%E5%BB%BA%E7%AB%8B%E4%BC%AA%E5%88%86%E5%B8%83%E5%BC%8Fhbase%E9%9B%86%E7%BE%A4/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="建立hadoop和hbase的伪分布式集群，hadoop和hbase分别运行在两个容器内，通过hadoop:9000端口访问。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-01-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-12-13T09:54:54.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="docker">
+<meta property="article:tag" content="hbase">
+<meta property="article:tag" content="hadoop">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2017/01/17/%E5%BB%BA%E7%AB%8B%E4%BC%AA%E5%88%86%E5%B8%83%E5%BC%8Fhbase%E9%9B%86%E7%BE%A4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>建立伪分布式hbase集群 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2017/01/17/%E5%BB%BA%E7%AB%8B%E4%BC%AA%E5%88%86%E5%B8%83%E5%BC%8Fhbase%E9%9B%86%E7%BE%A4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          建立伪分布式hbase集群
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-01-17 00:00:00" itemprop="dateCreated datePublished" datetime="2017-01-17T00:00:00+08:00">2017-01-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 17:54:54" itemprop="dateModified" datetime="2020-12-13T17:54:54+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>建立hadoop和hbase的伪分布式集群，hadoop和hbase分别运行在两个容器内，通过hadoop:9000端口访问。</p>
+<span id="more"></span>
+
+<h1 id="建立伪分布式hbase集群"><a href="#建立伪分布式hbase集群" class="headerlink" title="建立伪分布式hbase集群"></a>建立伪分布式hbase集群</h1><h1 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h1><ol>
+<li>建立hadoop伪分布式集群，挂载主机目录做为数据目录，暴露9000端口做为数据访问端口</li>
+<li>建立hbase伪分布式集群，使用hadoop:9000做为文件系统</li>
+<li>使用容器，并使用docker-compose简化系统启停</li>
+</ol>
+<h1 id="建立hadoop伪分布式集群"><a href="#建立hadoop伪分布式集群" class="headerlink" title="建立hadoop伪分布式集群"></a>建立hadoop伪分布式集群</h1><p>从<a target="_blank" rel="noopener" href="http://hadoop.apache.org/">官网</a>下载合适版本。hbase目前版本支持hadoop2.6.1+版本，不支持2.7.0，因此下载最新的2.6.5版本</p>
+<p>几个配置文件如下，全部参考<a target="_blank" rel="noopener" href="http://hadoop.apache.org/docs/r2.6.5/hadoop-project-dist/hadoop-common/SingleCluster.html">官方文档</a></p>
+<p>core-site.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">	&lt;property&gt;</span><br><span class="line">		&lt;name&gt;fs.defaultFS&lt;/name&gt;</span><br><span class="line">		&lt;value&gt;hdfs://hadoop:9000&lt;/value&gt;</span><br><span class="line">	&lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>hdfs-site.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">	&lt;property&gt;</span><br><span class="line">		&lt;name&gt;dfs.replication&lt;/name&gt;</span><br><span class="line">		&lt;value&gt;1&lt;/value&gt;</span><br><span class="line">	&lt;/property&gt;</span><br><span class="line">	&lt;property&gt;</span><br><span class="line">		&lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;</span><br><span class="line">		&lt;value&gt;file:/v/dfs/name&lt;/value&gt;</span><br><span class="line">	&lt;/property&gt;</span><br><span class="line">	&lt;property&gt;</span><br><span class="line">		&lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;</span><br><span class="line">		&lt;value&gt;file:/v/dfs/data&lt;/value&gt;</span><br><span class="line">	&lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这里的<code>/v/dfs/</code>是容器映射主机的目录，在docker-compose.xml文件中会有详细定义</p>
+<p>yarn-site.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line"></span><br><span class="line">&lt;!-- Site specific YARN configuration properties --&gt;</span><br><span class="line">	&lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;mapreduce_shuffle&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">    &lt;property&gt;</span><br><span class="line">        &lt;name&gt;yarn.resourcemanager.hostname&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;hadoop&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>mapred-site.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">	&lt;property&gt;</span><br><span class="line">        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;</span><br><span class="line">        &lt;value&gt;yarn&lt;/value&gt;</span><br><span class="line">    &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>dockerfile: dockerfile取名hadoop.dockerfile</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"># Creates pseudo distributed hadoop 2.6.5</span><br><span class="line"></span><br><span class="line">FROM java:on</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV HADOOP_VERSION=2.6.5</span><br><span class="line">ADD hadoop-$&#123;HADOOP_VERSION&#125;.tar.gz /</span><br><span class="line"></span><br><span class="line">ENV PATH /hadoop-$&#123;HADOOP_VERSION&#125;/bin:/hadoop-$&#123;HADOOP_VERSION&#125;/sbin:$PATH</span><br><span class="line">ENV HADOOP_PREFIX=/hadoop-$&#123;HADOOP_VERSION&#125;</span><br><span class="line"></span><br><span class="line">ADD core-site.xml $&#123;HADOOP_PREFIX&#125;/etc/hadoop/</span><br><span class="line">ADD hdfs-site.xml $&#123;HADOOP_PREFIX&#125;/etc/hadoop/</span><br><span class="line">ADD mapred-site.xml $&#123;HADOOP_PREFIX&#125;/etc/hadoop/</span><br><span class="line">ADD yarn-site.xml $&#123;HADOOP_PREFIX&#125;/etc/hadoop/</span><br><span class="line"></span><br><span class="line">RUN echo export JAVA_HOME=$&#123;JAVA_HOME&#125; &gt;&gt; $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh</span><br><span class="line">RUN echo export HADOOP_PREFIX=/hadoop-$&#123;HADOOP_VERSION&#125; &gt;&gt; $HADOOP_PREFIX/etc/hadoop/hadoop-env.sh</span><br><span class="line"></span><br><span class="line">RUN $HADOOP_PREFIX/bin/hdfs namenode -format -force</span><br><span class="line"></span><br><span class="line">ADD hadoop.sh /</span><br><span class="line">RUN chmod +x /hadoop.sh</span><br><span class="line"></span><br><span class="line">ENTRYPOINT [&quot;/hadoop.sh&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>说明：</p>
+<ol>
+<li>java:on是自定义的一个java镜像，基于isuper/java-oracle:jdk_8，增加ssh免密码登陆功能，并修正了时区。ssh免密码登陆是hadoop、hbase集群必备条件</li>
+<li>namenode必须先格式化，这里为了格式化已有的namenode，增加了force参数</li>
+<li>hadoop.sh启动hdfs和yarn服务，具体为</li>
+</ol>
+<p>hadoop.sh</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash </span><br><span class="line"></span><br><span class="line">service ssh start</span><br><span class="line">start-dfs.sh</span><br><span class="line">start-yarn.sh</span><br><span class="line">sleep 99999999</span><br></pre></td></tr></table></figure>
+
+<h1 id="建立hbase伪分布式集群"><a href="#建立hbase伪分布式集群" class="headerlink" title="建立hbase伪分布式集群"></a>建立hbase伪分布式集群</h1><p>从<a target="_blank" rel="noopener" href="http://hbase.apache.org/">官网</a>下载最新版本，这里是1.2.4版本</p>
+<p>配置文件，只有一个hbase-site.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;hbase.cluster.distributed&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;true&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;hbase.rootdir&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;hdfs://hadoop:9000/hbase&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;hbase.zookeeper.property.dataDir&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;hdfs://hadoop:9000/zookeeper&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>使用hadoop:9000端口，hadoop是前面hadoop集群的主机名称，在docker-compose.yml中指定</p>
+<p>dockerfile: 取名hbase.dockerfile</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">FROM java:on</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV HBASE_VERSION 1.2.4</span><br><span class="line"></span><br><span class="line">ADD hbase-$&#123;HBASE_VERSION&#125;-bin.tar.gz /</span><br><span class="line">ADD hbase-site.xml /hbase-$&#123;HBASE_VERSION&#125;/conf/</span><br><span class="line">ENV PATH /hbase-$&#123;HBASE_VERSION&#125;/bin:$PATH</span><br><span class="line">RUN echo export JAVA_HOME=$JAVA_HOME &gt;&gt; /hbase-$HBASE_VERSION/conf/hbase-env.sh</span><br><span class="line"></span><br><span class="line">ADD hbase.sh /</span><br><span class="line">RUN chmod +x /hbase.sh</span><br><span class="line"></span><br><span class="line">ENTRYPOINT [&quot;/hbase.sh&quot;]</span><br></pre></td></tr></table></figure>
+
+<p>hbase.sh启动hbase服务，具体为</p>
+<p>hbase.sh</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash </span><br><span class="line"></span><br><span class="line">service ssh start</span><br><span class="line">start-hbase.sh</span><br><span class="line">sleep 99999999</span><br></pre></td></tr></table></figure>
+
+<h1 id="建立容器，并使用docker-compose启停"><a href="#建立容器，并使用docker-compose启停" class="headerlink" title="建立容器，并使用docker-compose启停"></a>建立容器，并使用docker-compose启停</h1><p>docker-compose.yml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">version: &quot;2&quot;</span><br><span class="line">services:</span><br><span class="line">    hadoop:</span><br><span class="line">        build: </span><br><span class="line">            context: .</span><br><span class="line">            dockerfile: hadoop.dockerfile</span><br><span class="line">        image: hadoop_pseudo_distributed:2.6.5</span><br><span class="line">        container_name: hadoop</span><br><span class="line">        hostname: hadoop</span><br><span class="line">        ports:</span><br><span class="line">            - 50070:50070</span><br><span class="line">            - 8088:8088</span><br><span class="line">        volumes:</span><br><span class="line">            - ./data:/v</span><br><span class="line">         </span><br><span class="line">    hbase:</span><br><span class="line">        build: </span><br><span class="line">            context: .</span><br><span class="line">            dockerfile: hbase.dockerfile</span><br><span class="line">        image: hbase_pseudo_distributed:1.2.4</span><br><span class="line">        container_name: hbase</span><br><span class="line">        depends_on: </span><br><span class="line">            - hadoop</span><br><span class="line">        hostname: hbase</span><br><span class="line">        ports:</span><br><span class="line">            - 16010:16010</span><br><span class="line">        volumes:</span><br><span class="line">            - ./data:/v</span><br></pre></td></tr></table></figure>
+
+<p>定义两个服务，hadoop和hbase</p>
+<ul>
+<li>hadoop使用hadoop.dockerfile做为dockerfile，生成image叫hadoop_pseudo_distributed:2.6.5，启动的容器名为hadoop，主机名为hadoop，暴露两个端口50070和8088，并挂载主机当前目录下的data目录，从hdfs-site.xml可以知道，这个目录被用来当做hadoop的namenode和datanode目录。</li>
+<li>hbase类似</li>
+</ul>
+<p>docker1.10以后的网络功能大为增强，在docker daemon中新增了dns功能，所有使用自定义网络的容器都可以通过主机名互通，不再需要使用–link。</p>
+<p>把所有文件都放在一个目录下，共12个文件，一个data文件夹，这12个文件为</p>
+<p>hadoop文件</p>
+<ul>
+<li>hadoop-2.5.6.tar.gz</li>
+<li>hadoop.dockerfile</li>
+<li>hadoop.sh</li>
+<li>core-site.xml</li>
+<li>hdfs-site.xml</li>
+<li>yarn-site.xml</li>
+<li>mapred-site.xml</li>
+</ul>
+<p>hbase文件</p>
+<ul>
+<li>hbase-1.2.4.tar.gz</li>
+<li>hbase.dockerfile</li>
+<li>hbase.sh</li>
+<li>hbase-site.xml</li>
+</ul>
+<p>还有一个docker-compose.yml文件</p>
+<p>启动系统</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<p>停止系统</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose down</span><br></pre></td></tr></table></figure>
+
+<p>重建镜像</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose build</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d --build</span><br></pre></td></tr></table></figure>
+
+<h1 id="使用和验证"><a href="#使用和验证" class="headerlink" title="使用和验证"></a>使用和验证</h1><h2 id="hbase-shell"><a href="#hbase-shell" class="headerlink" title="hbase shell"></a>hbase shell</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it hbase /bin/bash</span><br></pre></td></tr></table></figure>
+
+<p>进入hbase容器，然后启动hbase shell</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hbase shell</span><br></pre></td></tr></table></figure>
+
+<p>在hbase shell下面创建表<code>test</code>，并增加2行</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">create &quot;test&quot;, &quot;cf&quot;</span><br><span class="line">put &quot;test&quot;, &quot;row1&quot;, &quot;cf:a&quot;, &quot;value1&quot;</span><br><span class="line">put &quot;test&quot;, &quot;row1&quot;, &quot;cf:b&quot;, &quot;value2&quot;</span><br><span class="line">put &quot;test&quot;, &quot;row2&quot;, &quot;cf:a&quot;, &quot;value3&quot;</span><br><span class="line">put &quot;test&quot;, &quot;row2&quot;, &quot;cf:c&quot;, &quot;value4&quot;</span><br></pre></td></tr></table></figure>
+
+<p>新增两行<code>row1</code>和<code>row2</code>，<code>row1</code>有a，b两列，<code>row2</code>有a，c两列</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">list &quot;test&quot;</span><br><span class="line">scan &quot;test&quot;</span><br><span class="line">get &quot;test&quot;, &quot;row1&quot;</span><br><span class="line">get &quot;test&quot;, &quot;row2&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="hadoop"><a href="#hadoop" class="headerlink" title="hadoop"></a>hadoop</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it hadoop /bin/bash</span><br></pre></td></tr></table></figure>
+
+<p>进入hadoop容器</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hadoop fs -ls /hbase</span><br></pre></td></tr></table></figure>
+
+<p>查看hdfs的文件目录</p>
+<h2 id="WEB查看"><a href="#WEB查看" class="headerlink" title="WEB查看"></a>WEB查看</h2><p>在主机的<a target="_blank" rel="noopener" href="http://localhost:16010/">localhost:16010</a>，<a target="_blank" rel="noopener" href="http://localhost:50070/">localhost:50070</a>，<a target="_blank" rel="noopener" href="http://localhost:8088/">localhost:8088</a>，可以查看hbase和hadoop的运行情况</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><a target="_blank" rel="noopener" href="http://hbase.apache.org/book.html#quickstart">hbase官方文档quick start</a></li>
+<li><a target="_blank" rel="noopener" href="http://hadoop.apache.org/docs/r2.6.5/hadoop-project-dist/hadoop-common/SingleCluster.html">hadoop官方文档Single Cluster</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/sequenceiq/hadoop-docker">sequenceiq的hadoop docker</a></li>
+<li><a target="_blank" rel="noopener" href="http://dockone.io/article/395">基于Docker快速搭建多节点Hadoop集群</a></li>
+<li><a target="_blank" rel="noopener" href="http://blog.csdn.net/kongdefei5000/article/details/51426235">基于docker的hadoop分布式集群</a></li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+              <a href="/tags/hbase/" rel="tag"># hbase</a>
+              <a href="/tags/hadoop/" rel="tag"># hadoop</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/05/13/JUNOS%E8%B0%83%E7%94%A8SHELL-COMMANDS/" rel="prev" title="junos cli调用shell commands">
+      <i class="fa fa-chevron-left"></i> junos cli调用shell commands
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/02/02/Win10%E4%B8%8B%E4%BD%BF%E7%94%A8cygwinX%20server%E8%BF%90%E8%A1%8Clinux%E5%AE%B9%E5%99%A8%E6%A1%8C%E9%9D%A2%EF%BC%8C%E5%B9%B6%E5%AE%9E%E7%8E%B0%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/" rel="next" title="Win10下使用cygwinX server运行linux容器桌面，并实现中文输入">
+      Win10下使用cygwinX server运行linux容器桌面，并实现中文输入 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E4%BC%AA%E5%88%86%E5%B8%83%E5%BC%8Fhbase%E9%9B%86%E7%BE%A4"><span class="nav-number">1.</span> <span class="nav-text">建立伪分布式hbase集群</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%AE%E6%A0%87"><span class="nav-number">2.</span> <span class="nav-text">目标</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8Bhadoop%E4%BC%AA%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4"><span class="nav-number">3.</span> <span class="nav-text">建立hadoop伪分布式集群</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8Bhbase%E4%BC%AA%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4"><span class="nav-number">4.</span> <span class="nav-text">建立hbase伪分布式集群</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E5%AE%B9%E5%99%A8%EF%BC%8C%E5%B9%B6%E4%BD%BF%E7%94%A8docker-compose%E5%90%AF%E5%81%9C"><span class="nav-number">5.</span> <span class="nav-text">建立容器，并使用docker-compose启停</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%92%8C%E9%AA%8C%E8%AF%81"><span class="nav-number">6.</span> <span class="nav-text">使用和验证</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#hbase-shell"><span class="nav-number">6.1.</span> <span class="nav-text">hbase shell</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hadoop"><span class="nav-number">6.2.</span> <span class="nav-text">hadoop</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WEB%E6%9F%A5%E7%9C%8B"><span class="nav-number">6.3.</span> <span class="nav-text">WEB查看</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">7.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

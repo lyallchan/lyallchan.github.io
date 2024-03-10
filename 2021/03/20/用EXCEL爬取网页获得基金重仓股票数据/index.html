@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="用EXCEL爬取网页获得基金重仓股票数据前面文章用Python和Powershell爬取网页，获得基金数据，再导入到EXCEL进行分析。 后来发现使用PowerQuery for EXCEL可以直接抓取网页数据，功能很强大。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用EXCEL爬取网页获得基金重仓股票数据">
+<meta property="og:url" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="用EXCEL爬取网页获得基金重仓股票数据前面文章用Python和Powershell爬取网页，获得基金数据，再导入到EXCEL进行分析。 后来发现使用PowerQuery for EXCEL可以直接抓取网页数据，功能很强大。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-43-57.png">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-48-08.png">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-48-47.png">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-49-47.png">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-51-35.png">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-54-18.png">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-54-50.png">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-55-30.png">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-56-01.png">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-58-00.png">
+<meta property="og:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-14-00-07.png">
+<meta property="article:published_time" content="2021-03-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-03-20T06:57:14.909Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="PowerQuery">
+<meta property="article:tag" content="基金">
+<meta property="article:tag" content="EXCEL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-43-57.png">
+
+<link rel="canonical" href="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>用EXCEL爬取网页获得基金重仓股票数据 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          用EXCEL爬取网页获得基金重仓股票数据
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-20 00:00:00 / 修改时间：14:57:14" itemprop="dateCreated datePublished" datetime="2021-03-20T00:00:00+08:00">2021-03-20</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="用EXCEL爬取网页获得基金重仓股票数据"><a href="#用EXCEL爬取网页获得基金重仓股票数据" class="headerlink" title="用EXCEL爬取网页获得基金重仓股票数据"></a>用EXCEL爬取网页获得基金重仓股票数据</h1><p>前面文章用Python和Powershell爬取网页，获得基金数据，再导入到EXCEL进行分析。</p>
+<p>后来发现使用PowerQuery for EXCEL可以直接抓取网页数据，功能很强大。</p>
+<span id="more"></span>
+
+<h1 id="M代码"><a href="#M代码" class="headerlink" title="M代码"></a>M代码</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">let</span><br><span class="line">    源 = Excel.CurrentWorkbook()&#123;[Name=&quot;表1&quot;]&#125;[Content],</span><br><span class="line">    更改的类型 = Table.TransformColumnTypes(源,&#123;&#123;&quot;基金代码&quot;, type text&#125;, &#123;&quot;基金名称&quot;, type text&#125;&#125;),</span><br><span class="line">    已添加自定义 = Table.AddColumn(更改的类型, &quot;自定义&quot;, each Json.Document(Web.Contents(&quot;https://danjuanapp.com/djapi/fund/detail/&quot;&amp;[基金代码]))),</span><br><span class="line">    #&quot;展开的“自定义”&quot; = Table.ExpandRecordColumn(已添加自定义, &quot;自定义&quot;, &#123;&quot;data&quot;&#125;, &#123;&quot;data&quot;&#125;),</span><br><span class="line">    #&quot;展开的“data”&quot; = Table.ExpandRecordColumn(#&quot;展开的“自定义”&quot;, &quot;data&quot;, &#123;&quot;fund_position&quot;&#125;, &#123;&quot;fund_position&quot;&#125;),</span><br><span class="line">    #&quot;展开的“fund_position”&quot; = Table.ExpandRecordColumn(#&quot;展开的“data”&quot;, &quot;fund_position&quot;, &#123;&quot;stock_list&quot;&#125;, &#123;&quot;stock_list&quot;&#125;),</span><br><span class="line">    #&quot;展开的“stock_list”&quot; = Table.ExpandListColumn(#&quot;展开的“fund_position”&quot;, &quot;stock_list&quot;),</span><br><span class="line">    #&quot;展开的“stock_list”1&quot; = Table.ExpandRecordColumn(#&quot;展开的“stock_list”&quot;, &quot;stock_list&quot;, &#123;&quot;name&quot;, &quot;code&quot;, &quot;percent&quot;, &quot;current_price&quot;&#125;, &#123;&quot;name&quot;, &quot;code&quot;, &quot;percent&quot;, &quot;current_price&quot;&#125;),</span><br><span class="line">    更改的类型1 = Table.TransformColumnTypes(#&quot;展开的“stock_list”1&quot;,&#123;&#123;&quot;name&quot;, type text&#125;, &#123;&quot;code&quot;, type text&#125;, &#123;&quot;percent&quot;, type number&#125;, &#123;&quot;current_price&quot;, type number&#125;&#125;),</span><br><span class="line">    被除的列 = Table.TransformColumns(更改的类型1, &#123;&#123;&quot;percent&quot;, each _ / 100, type number&#125;&#125;),</span><br><span class="line">    重命名的列 = Table.RenameColumns(被除的列,&#123;&#123;&quot;name&quot;, &quot;重仓股票&quot;&#125;, &#123;&quot;code&quot;, &quot;股票代码&quot;&#125;, &#123;&quot;percent&quot;, &quot;持仓比例&quot;&#125;, &#123;&quot;current_price&quot;, &quot;股票现值&quot;&#125;&#125;)</span><br><span class="line">in</span><br><span class="line">    重命名的列</span><br></pre></td></tr></table></figure>
+
+<h1 id="图形界面过程"><a href="#图形界面过程" class="headerlink" title="图形界面过程"></a>图形界面过程</h1><h2 id="基金列表导入Power-Query"><a href="#基金列表导入Power-Query" class="headerlink" title="基金列表导入Power Query"></a>基金列表导入Power Query</h2><p>在EXCEL中输入基金列表，包括基金代码和基金名称，然后选中基金列表，再选中菜单<code>数据</code>-<code>来自表格区域</code>，将基金列表导入PQ。</p>
+<img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-43-57.png" class="">
+
+<p>导入PQ后，基金代码自动识别为数字型，0开头的基金代码都不对，在右侧<code>应用的步骤</code>删除步骤<code>更改的类型</code>，并将基金代码设为文本型。</p>
+<img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-48-08.png" class="">
+
+<img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-48-47.png" class="">
+
+<h2 id="增加自定义列"><a href="#增加自定义列" class="headerlink" title="增加自定义列"></a>增加自定义列</h2><img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-49-47.png" class="">
+
+<p>输入自定义列公示</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Json.Document(Web.Contents(&quot;https://danjuanapp.com/djapi/fund/detail/&quot;&amp;[基金代码]))</span><br></pre></td></tr></table></figure>
+
+<p>如图</p>
+<img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-51-35.png" class="">
+
+<h2 id="展开自定义列，定位到所需要的节点"><a href="#展开自定义列，定位到所需要的节点" class="headerlink" title="展开自定义列，定位到所需要的节点"></a>展开自定义列，定位到所需要的节点</h2><p>上面输入的URL返回JSON信息，包括了我们需要的基金持仓的数据，节点为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data.fund_position.stock_list</span><br></pre></td></tr></table></figure>
+
+<p>按照上面的节点顺序，依次展开自定义列</p>
+<img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-54-18.png" class="">
+
+<img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-54-50.png" class="">
+
+<img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-55-30.png" class="">
+
+<img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-56-01.png" class="">
+
+<img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-13-58-00.png" class="">
+
+
+<p>最后一步选择前4列，这是我们需要的基金持仓数据</p>
+<img src="/2021/03/20/%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE/2021-03-20-14-00-07.png" class="">
+
+<p>最后修改列名、列类型，并将数据返回EXCEL，完成。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/PowerQuery/" rel="tag"># PowerQuery</a>
+              <a href="/tags/%E5%9F%BA%E9%87%91/" rel="tag"># 基金</a>
+              <a href="/tags/EXCEL/" rel="tag"># EXCEL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/02/25/%E9%87%8D%E7%BD%AEWindows%E7%BD%91%E7%BB%9C/" rel="prev" title="重置Windows网络">
+      <i class="fa fa-chevron-left"></i> 重置Windows网络
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/05/05/%E4%BD%BF%E7%94%A8DAX%E8%AE%A1%E7%AE%97%E5%9F%BA%E9%87%91%E6%94%B6%E7%9B%8A/" rel="next" title="使用DAX计算基金收益">
+      使用DAX计算基金收益 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8EXCEL%E7%88%AC%E5%8F%96%E7%BD%91%E9%A1%B5%E8%8E%B7%E5%BE%97%E5%9F%BA%E9%87%91%E9%87%8D%E4%BB%93%E8%82%A1%E7%A5%A8%E6%95%B0%E6%8D%AE"><span class="nav-number">1.</span> <span class="nav-text">用EXCEL爬取网页获得基金重仓股票数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#M%E4%BB%A3%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">M代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%BE%E5%BD%A2%E7%95%8C%E9%9D%A2%E8%BF%87%E7%A8%8B"><span class="nav-number">3.</span> <span class="nav-text">图形界面过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E9%87%91%E5%88%97%E8%A1%A8%E5%AF%BC%E5%85%A5Power-Query"><span class="nav-number">3.1.</span> <span class="nav-text">基金列表导入Power Query</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A2%9E%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E5%88%97"><span class="nav-number">3.2.</span> <span class="nav-text">增加自定义列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B1%95%E5%BC%80%E8%87%AA%E5%AE%9A%E4%B9%89%E5%88%97%EF%BC%8C%E5%AE%9A%E4%BD%8D%E5%88%B0%E6%89%80%E9%9C%80%E8%A6%81%E7%9A%84%E8%8A%82%E7%82%B9"><span class="nav-number">3.3.</span> <span class="nav-text">展开自定义列，定位到所需要的节点</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

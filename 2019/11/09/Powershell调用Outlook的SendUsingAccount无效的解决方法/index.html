@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="背景原来有个powershell脚本，供Totalcmd调用，可以将TC中选择的文件（列表）做为附件生成outlook邮件，并自动填写主题subject。这个程序一直运行的很好，后来又用ahk和python写了类似的脚本。 三个脚本中，powershell速度最慢，而且会有命令行窗口弹出，而ahk和python相对速度会快一点。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Powershell调用Outlook的SendUsingAccount无效的解决方法">
+<meta property="og:url" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="背景原来有个powershell脚本，供Totalcmd调用，可以将TC中选择的文件（列表）做为附件生成outlook邮件，并自动填写主题subject。这个程序一直运行的很好，后来又用ahk和python写了类似的脚本。 三个脚本中，powershell速度最慢，而且会有命令行窗口弹出，而ahk和python相对速度会快一点。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-08-51.png">
+<meta property="og:image" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-24-11.png">
+<meta property="og:image" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-47.png">
+<meta property="og:image" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-10.png">
+<meta property="article:published_time" content="2019-11-09T00:51:00.000Z">
+<meta property="article:modified_time" content="2020-12-13T11:55:15.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="Powershell">
+<meta property="article:tag" content="com">
+<meta property="article:tag" content="sendusingaccount">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-08-51.png">
+
+<link rel="canonical" href="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Powershell调用Outlook的SendUsingAccount无效的解决方法 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Powershell调用Outlook的SendUsingAccount无效的解决方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-09 08:51:00" itemprop="dateCreated datePublished" datetime="2019-11-09T08:51:00+08:00">2019-11-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 19:55:15" itemprop="dateModified" datetime="2020-12-13T19:55:15+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>原来有个powershell脚本，供Totalcmd调用，可以将TC中选择的文件（列表）做为附件生成outlook邮件，并自动填写主题subject。这个程序一直运行的很好，后来又用ahk和python写了类似的脚本。</p>
+<p>三个脚本中，powershell速度最慢，而且会有命令行窗口弹出，而ahk和python相对速度会快一点。</p>
+<span id="more"></span>
+
+<p>下面贴出三个代码</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$outlook</span> = <span class="built_in">new-object</span> <span class="literal">-com</span> outlook.application</span><br><span class="line"><span class="variable">$mail</span> = <span class="variable">$outlook</span>.CreateItem(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="variable">$mail</span>.Subject = <span class="variable">$args</span><span class="function">[<span class="number">0</span>]</span></span><br><span class="line"><span class="keyword">foreach</span> ( <span class="variable">$file</span> <span class="keyword">in</span> <span class="variable">$args</span>[<span class="number">1</span><span class="type">..</span>(<span class="variable">$args</span><span class="type">.count</span>-<span class="number">1</span>)] )</span><br><span class="line">&#123;</span><br><span class="line">    <span class="variable">$mail</span>.Attachments.add(<span class="variable">$file</span>) | <span class="built_in">Out-Null</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="variable">$mail</span>.Display()</span><br><span class="line"><span class="keyword">return</span></span><br></pre></td></tr></table></figure>
+
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Outlook := ComObjCreate(<span class="string">&quot;Outlook.Application&quot;</span>)</span><br><span class="line">Mail := Outlook.CreateItem[<span class="number">0</span>]</span><br><span class="line">m = <span class="variable">%1%</span></span><br><span class="line">Mail.Subject := m</span><br><span class="line"><span class="built_in">Loop %</span><span class="number">0</span>%  <span class="comment">; </span></span><br><span class="line"><span class="built_in">    ifnotequal,</span> <span class="built_in">A_index</span>, <span class="number">1</span></span><br><span class="line">        Mail.Attachments.add(<span class="variable">%A_Index%</span>)</span><br><span class="line">Mail.display()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> win32com.client.gencache <span class="keyword">import</span> EnsureDispatch <span class="keyword">as</span> Dispatch </span><br><span class="line">outlook = Dispatch(<span class="string">&quot;Outlook.Application&quot;</span>)</span><br><span class="line">ma = outlook.CreateItem(<span class="number">0</span>) </span><br><span class="line">ma.Subject = <span class="string">&quot;test&quot;</span> </span><br><span class="line">ma.To = <span class="string">&quot;c@c&quot;</span> </span><br><span class="line">ma.Attachments.Add(<span class="string">&quot;C:/BOOTNXT&quot;</span>) </span><br><span class="line">ma.Attachments.Add(<span class="string">&quot;C://BOOTNXT&quot;</span>)</span><br><span class="line">ma.Display()</span><br></pre></td></tr></table></figure>
+
+<h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>从上面的代码可以看出，createitem是用默认账号生成邮件。我的outlook一直只有一个账号，直到有一天我有添加了一个账号，并把新的账号做为默认账号，上面的脚本使用新的默认账号生成邮件，而不是用原来的账号。</p>
+<p>脚本需要增加使用指定账号生成邮件的功能。google后，很容易就找到设置<code>mail.SendUsingAccount</code>属性为指定账号就可以了。</p>
+<p>在ahk上很快通过</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Mail.SendUsingAccount := Outlook.Session.Accounts.Item(<span class="string">&quot;designated.account@mailbox.com&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<p>但是ps和py用上面的方法始后，还是显示SendUsingAccount为空。</p>
+<p>如果我在outlook界面上修改发送账号，如下图，改变发件人，可以修改发送账号，SendUsingAccount会跟着改变，并且用上面的方法也可以修改SendUsingAccount的值。似乎在SendUsingAccount为空的情况下会赋值失败，直到SendUsingAccount有了初始值以后，才能正确赋值。</p>
+<img src="/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-08-51.png" class="">
+
+<p>这个兄弟的遭遇和我一摸一样</p>
+<img src="/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-24-11.png" class="">
+
+
+<p>我觉得这是Outlook一个BUG!!</p>
+<h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><p>经过艰难搜索，用了各种关键字，最终通过搜索python找到了一个帖子</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://social.msdn.microsoft.com/Forums/windows/en-US/7afc9e42-ca4f-491b-8c50-19556fb4e1cf/sendusingaccount-does-not-work-in-outlook-2010-possible-bug?forum=outlookdev</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>解决方法分别为。</p>
+<img src="/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-47.png" class="">
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">account = outlook.Session.Accounts.Item(<span class="string">&quot;designated.account@mailbox.com&quot;</span>)</span><br><span class="line">ma._oleobj_.Invoke(*(<span class="number">64209</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">0</span>, account))     <span class="comment"># ma.SendUsingAccount = account</span></span><br></pre></td></tr></table></figure>
+
+<img src="/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-10.png" class="">
+
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$account</span> = <span class="variable">$outlook</span>.Session.Accounts.Item(<span class="string">&quot;designated.account@mailbox.com&quot;</span>)</span><br><span class="line"><span class="variable">$mail</span>.GetType().InvokeMember(<span class="string">&quot;SendUsingAccount&quot;</span>,<span class="string">&quot;SetProperty&quot;</span>,<span class="variable">$NULL</span>,<span class="variable">$mail</span>,<span class="variable">$account</span>)</span><br></pre></td></tr></table></figure>
+
+<p>通过帖子，隐约猜到应该是传值和传指针的问题，至于为什么，我也不知道。</p>
+<h1 id="感想"><a href="#感想" class="headerlink" title="感想"></a>感想</h1><p>这次找解决方案，原来主要方向是通过powershell寻找，毕竟powershell和outlook都是微软的产品，技术文档应该更全一点。可事实偏偏是python的解决方法更加容易找到。Powershell功能强大，用过的人都说好，但毕竟还是用户太少，导致很多问题都找不到答案，官方的论坛和技术支持的回答过于官方，不能解决问题。推广Powrshell以及跨平台的Powershell Core仍然任重道远。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Powershell/" rel="tag"># Powershell</a>
+              <a href="/tags/com/" rel="tag"># com</a>
+              <a href="/tags/sendusingaccount/" rel="tag"># sendusingaccount</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/04/16/Dynalist%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%87%AA%E5%AE%9A%E4%B9%89CSS/" rel="prev" title="Dynalist客户端自定义CSS">
+      <i class="fa fa-chevron-left"></i> Dynalist客户端自定义CSS
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/" rel="next" title="用PowerQuery制作多表数据透视表">
+      用PowerQuery制作多表数据透视表 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%B5%B7%E5%9B%A0"><span class="nav-number">2.</span> <span class="nav-text">起因</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3"><span class="nav-number">3.</span> <span class="nav-text">解决</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%84%9F%E6%83%B3"><span class="nav-number">4.</span> <span class="nav-text">感想</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

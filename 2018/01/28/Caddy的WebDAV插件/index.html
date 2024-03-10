@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="Caddy是什么Caddy是用Golang开发的WEB Server，和所有Golang开发的程序一样，编译以后是个只有命令行的单文件程序。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Caddy的WebDAV插件和Total Commander">
+<meta property="og:url" content="http://lyallchan.github.io/2018/01/28/Caddy%E7%9A%84WebDAV%E6%8F%92%E4%BB%B6/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="Caddy是什么Caddy是用Golang开发的WEB Server，和所有Golang开发的程序一样，编译以后是个只有命令行的单文件程序。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-01-28T05:39:15.000Z">
+<meta property="article:modified_time" content="2023-12-01T10:15:28.297Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="Caddy">
+<meta property="article:tag" content="WebDAV">
+<meta property="article:tag" content="Golang，Total Commander">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2018/01/28/Caddy%E7%9A%84WebDAV%E6%8F%92%E4%BB%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Caddy的WebDAV插件和Total Commander | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2018/01/28/Caddy%E7%9A%84WebDAV%E6%8F%92%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Caddy的WebDAV插件和Total Commander
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2018-01-28 13:39:15" itemprop="dateCreated datePublished" datetime="2018-01-28T13:39:15+08:00">2018-01-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-12-01 18:15:28" itemprop="dateModified" datetime="2023-12-01T18:15:28+08:00">2023-12-01</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Caddy是什么"><a href="#Caddy是什么" class="headerlink" title="Caddy是什么"></a>Caddy是什么</h1><p>Caddy是用Golang开发的WEB Server，和所有Golang开发的程序一样，编译以后是个只有命令行的单文件程序。</p>
+<span id="more"></span>
+
+<p>GitHub地址 <a target="_blank" rel="noopener" href="https://github.com/mholt/caddy">https://github.com/mholt/caddy</a><br>官网主页 <a target="_blank" rel="noopener" href="https://caddyserver.com/">https://caddyserver.com/</a></p>
+<p>原来使用Caddy当作临时文件服务器来用，一行命令搞定</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Caddy -port 80 browse</span><br></pre></td></tr></table></figure>
+
+<p>把当前目录HTTP出来，使用浏览器直接访问<code>http://localhost</code>就可以看到当前目录下的文件，方便，绿色。</p>
+<p>配合Total commander，可以在Total Commander的usercmd.ini增加一个命令，代码为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[em_Caddy]</span><br><span class="line">cmd=%Commander_path%\..\Caddy\Caddy.exe</span><br><span class="line">param=-port 80 browse</span><br><span class="line">menu=HTTP共享当前目录</span><br></pre></td></tr></table></figure>
+<p>这样，一个按钮就可以在HTTP共享当前目录。</p>
+<h1 id="Caddy的WebDAV插件"><a href="#Caddy的WebDAV插件" class="headerlink" title="Caddy的WebDAV插件"></a>Caddy的WebDAV插件</h1><p>这次发现Caddy有了WebDAV插件，那比HTTP共享又方便了一点。</p>
+<p>文档 <a target="_blank" rel="noopener" href="https://caddyserver.com/docs/http.webdav">https://caddyserver.com/docs/http.webdav</a></p>
+<p>使用WebDAV要重新下载含有WebDAV的Caddy版本，在下载页面<code>https://caddyserver.com/download</code>上可以选择</p>
+<p>下载合适的版本以后，发现配置比较麻烦，难道要写一个Caddyfile？不绿色</p>
+<p>Caddy命令行支持重定向功能</p>
+<blockquote>
+<p>Pipe a Caddyfile</p>
+</blockquote>
+<blockquote>
+<p>Advanced users may wish to pipe the contents of a Caddyfile into Caddy from programmed environments. If you pipe in the Caddyfile, you must use the -conf flag with a value of stdin - for example:</p>
+</blockquote>
+<blockquote>
+<p>$ echo “localhost:1234” | caddy -conf stdin</p>
+</blockquote>
+<blockquote>
+<p>Piping the Caddyfile is convenient when starting Caddy using a dynamically-generated Caddyfile from a parent process you have control over.</p>
+</blockquote>
+<blockquote>
+<p>管道化Caddyfile<br>高级用户可以使用管道功能，将Caddyfile动态输入Caddy的stdin。如果使用管道功能，你必须使用<code>-conf stdin</code> 参数来表示Caddy从标准输入读取配置文件。举例</p>
+</blockquote>
+<blockquote>
+<p>$ echo “localhost:1234” | caddy -conf stdin</p>
+</blockquote>
+<blockquote>
+<p>管道化Caddyfile可以让你动态配置参数。</p>
+</blockquote>
+<p>由于Total Commander自定义命令不支持管道，写一个批命令来做这个事情。</p>
+<figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">@<span class="built_in">echo</span> off</span><br><span class="line">(</span><br><span class="line"><span class="built_in">echo</span> :<span class="number">80</span></span><br><span class="line"><span class="built_in">echo</span> webdav &#123;</span><br><span class="line"><span class="built_in">echo</span>    modify false</span><br><span class="line"><span class="built_in">echo</span>        &#125;</span><br><span class="line">) | <span class="variable">%~dp0%</span>caddy.exe -conf stdin</span><br></pre></td></tr></table></figure>
+
+<p>很简单，自己看。<code>%~dp0%</code>在bat文件的启动目录找到caddy.exe。</p>
+<p>在Total Commander中增加一个命令</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[em_Caddy]</span><br><span class="line">button=%COMMANDER_PATH%\TOTALCMD64.EXE,33</span><br><span class="line">cmd=%COMMANDER_PATH%\..\Caddy\caddy.cmd</span><br><span class="line">menu=WebDAV共享当前目录</span><br></pre></td></tr></table></figure>
+
+<p>2018-01-29更新</p>
+<p>直接新增命令就行，不需要写bat文件</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[em_Caddy]</span><br><span class="line">button=%COMMANDER_PATH%\TOTALCMD64.EXE,33</span><br><span class="line">cmd=%COMMANDER_PATH%\..\Caddy\caddy.exe</span><br><span class="line">param=-port 80 &quot;basicauth lyallchan 20002000&quot; webdav</span><br><span class="line">menu=WebDAV共享当前目录</span><br></pre></td></tr></table></figure>
+<p>增加一个用户认证，这样就不要配置webdav的只读参数</p>
+<p>大功告成。</p>
+<h1 id="BUG"><a href="#BUG" class="headerlink" title="BUG"></a>BUG</h1><p>要共享的目录层次很深，文件数量很多的时候，出错。</p>
+<p>试了几次，Windows下WebDAV启动的时候，似乎要读取共享目录下的所有文件，当文件数量很多的时候，要花很长时间读取目录，资源耗尽的时候会出错。</p>
+<p>看了github上，作者说他只是调用了Golang的WEBDAV包，不知道原理。看来以后再研究。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Caddy/" rel="tag"># Caddy</a>
+              <a href="/tags/WebDAV/" rel="tag"># WebDAV</a>
+              <a href="/tags/Golang%EF%BC%8CTotal-Commander/" rel="tag"># Golang，Total Commander</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2018/01/05/Outlook%E5%8F%91%E9%80%81%E6%97%B6%E9%97%B4%E6%97%A0%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/" rel="prev" title="Outlook发送时间无的解决方法">
+      <i class="fa fa-chevron-left"></i> Outlook发送时间无的解决方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/02/03/win10%EF%BC%8C%E6%9B%B4%E6%96%B0%E6%88%96%E9%87%8D%E5%90%AF%E5%90%8E%EF%BC%8C%E4%BD%BF%E7%94%A8%E6%88%91%E7%9A%84%E7%99%BB%E5%BD%95%E4%BF%A1%E6%81%AF%E8%87%AA%E5%8A%A8%E5%AE%8C%E6%88%90%E8%AE%BE%E5%A4%87%E8%AE%BE%E7%BD%AE/" rel="next" title="win10，更新或重启后，使用我的登录信息自动完成设备设置">
+      win10，更新或重启后，使用我的登录信息自动完成设备设置 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Caddy%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.</span> <span class="nav-text">Caddy是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Caddy%E7%9A%84WebDAV%E6%8F%92%E4%BB%B6"><span class="nav-number">2.</span> <span class="nav-text">Caddy的WebDAV插件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BUG"><span class="nav-number">3.</span> <span class="nav-text">BUG</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

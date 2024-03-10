@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="搭建mesos集群，使用zookeeper管理mesos master，防止单点失效。在mesos集群上运行spark，并搭建jupyter，做为spark client。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="spark on mesos in docker">
+<meta property="og:url" content="http://lyallchan.github.io/2017/03/17/spark-on-mesos-in-docker/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="搭建mesos集群，使用zookeeper管理mesos master，防止单点失效。在mesos集群上运行spark，并搭建jupyter，做为spark client。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-03-17T11:19:49.000Z">
+<meta property="article:modified_time" content="2020-12-13T09:54:54.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="spark">
+<meta property="article:tag" content="mesos">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="zookeeper">
+<meta property="article:tag" content="jupyter">
+<meta property="article:tag" content="conda">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2017/03/17/spark-on-mesos-in-docker/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>spark on mesos in docker | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2017/03/17/spark-on-mesos-in-docker/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          spark on mesos in docker
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-03-17 19:19:49" itemprop="dateCreated datePublished" datetime="2017-03-17T19:19:49+08:00">2017-03-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 17:54:54" itemprop="dateModified" datetime="2020-12-13T17:54:54+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>搭建mesos集群，使用zookeeper管理mesos master，防止单点失效。在mesos集群上运行spark，并搭建jupyter，做为spark client。</p>
+<span id="more"></span>
+
+<h1 id="搭建zookeeper-mesos集群"><a href="#搭建zookeeper-mesos集群" class="headerlink" title="搭建zookeeper\mesos集群"></a>搭建zookeeper\mesos集群</h1><p>3个zookeeper，3个mesos master</p>
+<h2 id="zookeeper-dockerfile"><a href="#zookeeper-dockerfile" class="headerlink" title="zookeeper dockerfile"></a>zookeeper dockerfile</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">FROM openjdk8:on</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV ZOOKEEPER=&quot;zookeeper-3.4.9&quot;</span><br><span class="line">RUN busybox wget http://caddy/$ZOOKEEPER.tar.gz -O - | tar zx &amp;&amp; ln -s /$ZOOKEEPER /zookeeper</span><br><span class="line">RUN mv /zookeeper/conf/zoo_sample.cfg /zookeeper/conf/zoo.cfg</span><br><span class="line">ENV PATH /zookeeper/bin:$PATH</span><br></pre></td></tr></table></figure>
+
+<p>很简单，就是下载解压，默认的配置文件，zookeeper/bin加入路径</p>
+<h2 id="mesos-dockerfile"><a href="#mesos-dockerfile" class="headerlink" title="mesos dockerfile"></a>mesos dockerfile</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">FROM openjdk8:on</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV MESOS=&quot;mesos-bin-1.1.0&quot;</span><br><span class="line">RUN busybox wget http://caddy/$MESOS.tar.gz -O - | tar xz &amp;&amp; ln -s /$MESOS /mesos </span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install -y \</span><br><span class="line">        libsvn1 \</span><br><span class="line">        libcurl3-nss</span><br><span class="line">ENV PATH /mesos/bin:/mesos/sbin:$PATH</span><br><span class="line"></span><br><span class="line">ENV CONDA=&quot;Miniconda2-latest-Linux-x86_64.sh&quot;</span><br><span class="line">RUN busybox wget http://caddy/$CONDA -P /</span><br><span class="line">RUN bash /$CONDA -b -p conda</span><br><span class="line">RUN rm /$CONDA</span><br><span class="line">ENV PATH /conda/bin:$PATH</span><br><span class="line">ENV PYTHONPATH=$PYTHONPATH:/mesos/lib/python2.7/site-packages/</span><br><span class="line">RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ \</span><br><span class="line">    &amp;&amp; conda config --set show_channel_urls yes</span><br></pre></td></tr></table></figure>
+
+<p>mesos部分也比较简单，下载解压，mesos/bin和mesos/sbin加入路径。</p>
+<p>安装了libsvn1和libcurl3-nss包，这是在启动mesos的时候提示缺少文件，再加上去的。</p>
+<p>mesos WEB UI需要python运行，这里没有直接安装python，而是使用了conda。</p>
+<p>conda是偏重于科学计算的python套件，其中的包管理工具conda比pip好用。</p>
+<p>conda的安装包直接是个脚本文件，bash这个文件就可以安装，加上-b参数可以接受默认配置，自动安装</p>
+<p>最后的conda config是换国内源</p>
+<h2 id="启动zookeeper集群"><a href="#启动zookeeper集群" class="headerlink" title="启动zookeeper集群"></a>启动zookeeper集群</h2><p>zookeeper start.sh</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line"></span><br><span class="line">NETWORK=&quot;net&quot;</span><br><span class="line">CONTAINER=&quot;zoo&quot;</span><br><span class="line">NUM=3 # hosts in cluster </span><br><span class="line"></span><br><span class="line"># start zookeeper containers...</span><br><span class="line">echo </span><br><span class="line">echo starting zookeeper containers...</span><br><span class="line">for i in `seq $NUM`; do</span><br><span class="line">    docker run \</span><br><span class="line">        -d \</span><br><span class="line">        --hostname $&#123;CONTAINER&#125;$i \</span><br><span class="line">        --name $&#123;CONTAINER&#125;$i \</span><br><span class="line">        --net $NETWORK \</span><br><span class="line">        zookeeper \</span><br><span class="line">        /bin/bash -c &quot;/etc/init.d/ssh start &amp;&amp; sleep 99999999&quot;</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line"># start zookeeper service</span><br><span class="line">echo</span><br><span class="line">echo starting zookeeper service</span><br><span class="line">ZOOKEEPER_DATADIR=&quot;/zookeeper/data&quot;</span><br><span class="line">for i in `seq 1 $NUM`; do</span><br><span class="line"></span><br><span class="line">    #/zoo.cfg specially for server:1=xxxxx</span><br><span class="line">    for j in `seq $NUM`; do</span><br><span class="line">        docker exec $&#123;CONTAINER&#125;$i /bin/bash -c &quot;echo server.$j=$&#123;CONTAINER&#125;$j:2888:3888 &gt;&gt; /zookeeper/conf/zoo.cfg&quot;</span><br><span class="line">    done</span><br><span class="line">    docker exec $&#123;CONTAINER&#125;$i /bin/bash -c &quot;echo dataDir=$ZOOKEEPER_DATADIR &gt;&gt; /zookeeper/conf/zoo.cfg&quot;</span><br><span class="line">    docker exec $&#123;CONTAINER&#125;$i /bin/bash -c &quot;mkdir -p $ZOOKEEPER_DATADIR&quot;</span><br><span class="line">    docker exec $&#123;CONTAINER&#125;$i /bin/bash -c &quot;echo $i &gt; $ZOOKEEPER_DATADIR/myid&quot;</span><br><span class="line"></span><br><span class="line">    docker exec $&#123;CONTAINER&#125;$i /zookeeper/bin/zkServer.sh start</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">echo done!</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>由于启动zookeeper服务器的数量需要动态调整，不必重新生成image，因此采用先启动容器，再动态生成配置文件，启动服务的方案。</p>
+<p>NUM是zookeeper服务器的数量，官方推荐奇数，最少3台服务器，这里就定义为3</p>
+<p>第二段是启动容器，并同时启动了ssh服务</p>
+<p>第三段是动态生成zoo.cfg和myid，并启动zookeeper服务。最后生成的zoo.cfg，除去默认的部分为</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">server.1=zoo1:2888:3888</span><br><span class="line">server.2=zoo2:2888:3888</span><br><span class="line">server.3=zoo3:2888:3888</span><br><span class="line">dataDir=/zookeeper/data</span><br></pre></td></tr></table></figure>
+
+<p>myid根据服务器顺序分别为1,2,3</p>
+<p>zkServer.sh start启动服务。</p>
+<h2 id="启动mesos-master集群"><a href="#启动mesos-master集群" class="headerlink" title="启动mesos master集群"></a>启动mesos master集群</h2><p>mesos start-master.sh</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line"></span><br><span class="line">CONTAINER=mesos</span><br><span class="line">NET=net</span><br><span class="line">MASTER=zk://zoo1:2181,zoo3:2181,zoo3:2181/mesos</span><br><span class="line"></span><br><span class="line">for i in `seq 3`; do</span><br><span class="line">    docker run \</span><br><span class="line">        -itd \</span><br><span class="line">        --hostname $&#123;CONTAINER&#125;$i \</span><br><span class="line">        --name $&#123;CONTAINER&#125;$i \</span><br><span class="line">        -p 505$i:505$i \</span><br><span class="line">        --network $NET \</span><br><span class="line">        -e MESOS_QUORUM=2 \</span><br><span class="line">        -e MESOS_ZK=$MASTER \</span><br><span class="line">        -e MESOS_WORK_DIR=&quot;/&quot; \</span><br><span class="line">        -e MESOS_HOSTNAME=localhost \</span><br><span class="line">        -e MESOS_PORT=505$i \</span><br><span class="line">        mesos \</span><br><span class="line">        mesos-master</span><br><span class="line">done</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>mesos的配置可以有两种方式传递</p>
+<ol>
+<li>命令行参数</li>
+<li>环境变量</li>
+</ol>
+<p>docker环境下，传递环境变量比较方便</p>
+<p>MASTER指向zookeeper集群，并在容器启动时，传递给MESOS_ZK</p>
+<p>按照顺序分别启动mesos-master容器</p>
+<ul>
+<li>暴露5051,5052,5052端口</li>
+<li>定义HOSTNAME，这个参数是mesos WEB UI定时刷新页面的时候访问的地址，由于是docker环境，端口暴露后的主机为localhost。</li>
+<li>其它参数比较好理解</li>
+</ul>
+<p>这样，启动了mesos master集群，并使用zookeeper做HA，防止单点失效。</p>
+<h1 id="在mesos上运行spark"><a href="#在mesos上运行spark" class="headerlink" title="在mesos上运行spark"></a>在mesos上运行spark</h1><h2 id="spark-dockerfile"><a href="#spark-dockerfile" class="headerlink" title="spark dockerfile"></a>spark dockerfile</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">FROM mesos</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV SPARK=&quot;spark-2.1.0-bin-hadoop2.6&quot;</span><br><span class="line">RUN busybox wget -O - http://caddy/$SPARK.tgz | tar zx \</span><br><span class="line">    &amp;&amp; ln -s /$SPARK /spark</span><br><span class="line">ENV PATH /spark/sbin:/spark/bin:$PATH</span><br><span class="line">ENV SPARK_HOME=/spark</span><br><span class="line">RUN echo &quot;export MESOS_NATIVE_JAVA_LIBRARY=/mesos/lib/libmesos.so&quot; &gt;&gt; /spark/conf/spark-env.sh</span><br><span class="line">ENV PYSPARK_PYTHON=/conda/bin/python</span><br><span class="line">RUN conda install numpy -y</span><br></pre></td></tr></table></figure>
+
+<p>spark在mesos上运行，必须要有mesos环境，因此在mesos镜像基础上建立spark镜像。</p>
+<p>官网上说，除了将spark压缩包放在mesos可以访问的地方，也可以在所有mesos slave的相同目录安装spark，配置spark.mesos.excutor.home指向$SPARK_HOME</p>
+<blockquote>
+<p>Alternatively, you can also install Spark in the same location in all the Mesos slaves, and configure spark.mesos.executor.home (defaults to SPARK_HOME) to point to that location.</p>
+</blockquote>
+<p>安装过程很常规，下载解压。</p>
+<p>在spark-env.sh中设置MESOS_NATIVE_JAVA_LIBRARY为libmesos.so</p>
+<p>设置PYSPARK_PYTHON为conda的python，使得spark可以找到python</p>
+<p>最后装上numpy包</p>
+<h2 id="启动spark"><a href="#启动spark" class="headerlink" title="启动spark"></a>启动spark</h2><p>spark start-mesos-slave.sh</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line"></span><br><span class="line">DIR=`dirname $0`</span><br><span class="line">DATA=`cygpath -aw $DIR/data`</span><br><span class="line">NET=&quot;net&quot;</span><br><span class="line">CONTAINER=&quot;spark&quot;</span><br><span class="line">MASTER=zk://zoo1:2181,zoo2:2181,zoo3:2181/mesos</span><br><span class="line">S_NUM=3</span><br><span class="line"></span><br><span class="line"># start spark slave containers with mesos</span><br><span class="line">for i in `seq 1 $S_NUM`;do </span><br><span class="line">    docker run \</span><br><span class="line">        -itd \</span><br><span class="line">        --hostname $&#123;CONTAINER&#125;_s$i \</span><br><span class="line">        --name $&#123;CONTAINER&#125;_s$i \</span><br><span class="line">        --network $NET \</span><br><span class="line">        --privileged \</span><br><span class="line">        --volume &quot;$DATA&quot;:/v \</span><br><span class="line">        -e MESOS_MASTER=$MASTER \</span><br><span class="line">        -e MESOS_WORK_DIR=&quot;/&quot; \</span><br><span class="line">        -e MESOS_SYSTEMD_ENABLE_SUPPORT=false \</span><br><span class="line">        spark \</span><br><span class="line">        mesos-slave</span><br><span class="line">done</span><br></pre></td></tr></table></figure>
+
+<p>与其说启动spark，不如说是启动mesos slave。当客户端提交spark应用后，mesos slave再启动spark。</p>
+<p>mesos slave使用容器技术（自带的或者docker）启动framework，framework是运行在mesos上的应用程序。因此启动mesos slave容器比较麻烦，需要特权启动，如果使用docker，还需要绑定宿主机的docker.sock和docker。</p>
+<p>S_NUM是启动的spark节点数量，最小1个，这里取3个。</p>
+<h1 id="搭建jupyter"><a href="#搭建jupyter" class="headerlink" title="搭建jupyter"></a>搭建jupyter</h1><p>搭建jupyter做为spark集群客户端。</p>
+<h2 id="jupyter-dockerfile"><a href="#jupyter-dockerfile" class="headerlink" title="jupyter dockerfile"></a>jupyter dockerfile</h2><p>jupyter做为spark集群客户端需要有mesos、spark以及python环境。</p>
+<p>上面的spark镜像也有这三个环境，不过其中python是mini conda。</p>
+<p>为了使用jupyter，有两个选择，可以在spark镜像基础上再安装jupyter，也可以从头安装mesos和spark，并安装anaconda，anaconda是更加强大的python科学计算包，其中包括了jupyter。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"># Creates anaconda with spark </span><br><span class="line"></span><br><span class="line">FROM openjdk8:on</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV MESOS=&quot;mesos-bin-1.1.0&quot;</span><br><span class="line">RUN busybox wget http://caddy/$MESOS.tar.gz -O - | tar xz &amp;&amp; ln -s /$MESOS /mesos </span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install -y \</span><br><span class="line">        libsvn1 \</span><br><span class="line">        libcurl3-nss</span><br><span class="line">ENV PATH /mesos/bin:/mesos/sbin:$PATH</span><br><span class="line"></span><br><span class="line">ENV SPARK=&quot;spark-2.1.0-bin-hadoop2.6&quot;</span><br><span class="line">RUN busybox wget -O - http://caddy/$SPARK.tgz | tar zx \</span><br><span class="line">    &amp;&amp; ln -s /$SPARK /spark</span><br><span class="line">ENV PATH /spark/sbin:/spark/bin:$PATH</span><br><span class="line">ENV SPARK_HOME=/spark</span><br><span class="line">RUN echo &quot;export MESOS_NATIVE_JAVA_LIBRARY=/mesos/lib/libmesos.so&quot; &gt;&gt; /spark/conf/spark-env.sh</span><br><span class="line"></span><br><span class="line">ENV CONDA=Anaconda2-4.3.0-Linux-x86_64.sh</span><br><span class="line">RUN busybox wget http://caddy/$CONDA -P /</span><br><span class="line">RUN bash /$CONDA -b -p conda</span><br><span class="line">RUN rm /$CONDA</span><br><span class="line">ENV PATH /conda/bin:$PATH</span><br><span class="line">ENV PYSPARK_DRIVER_PYTHON jupyter</span><br><span class="line">ENV PYSPARK_DRIVER_PYTHON_OPTS &quot;notebook --ip=&#x27;*&#x27; --NotebookApp.password=&#x27;&#x27; --NotebookApp.token=&#x27;&#x27; --no-browser&quot;</span><br><span class="line">ENV PYSPARK_PYTHON=/conda/bin/python</span><br><span class="line">RUN conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/ \</span><br><span class="line">    &amp;&amp; conda config --set show_channel_urls yes</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>mesos\spark常规安装，spark安装好以后，在spark-env.sh设置变量MESOS_NATIVE_JAVA_LIBRARY。</p>
+<p>anaconda下载安装好以后，要设置2个环境变量，使得pyspark启动时，调用jupyter notebook，这在pyspark脚本中有详细说明：</p>
+<blockquote>
+<p>In Spark 2.0, IPYTHON and IPYTHON_OPTS are removed and pyspark fails to launchis set in the user’s environment. Instead, users should set PYSPARK_DRIVER_PYTHON to use IPython and set PYSPARK_DRIVER_PYTHON_OPTS to pass options when starting (e.g. PYSPARK_DRIVER_PYTHON_OPTS=’notebook’).  This supports full customization and executor Python executables.</p>
+</blockquote>
+<ol>
+<li>ENV PYSPARK_DRIVER_PYTHON jupyter</li>
+<li>ENV PYSPARK_DRIVER_PYTHON_OPTS “notebook –ip=’*’ –NotebookApp.password=’’ –NotebookApp.token=’’ –no-browser”</li>
+</ol>
+<p>还要设置PYSPARK_PYTHON指向/conda/bin/python，使得spark可以找到python。</p>
+<h2 id="启动jupyter"><a href="#启动jupyter" class="headerlink" title="启动jupyter"></a>启动jupyter</h2><p>jupyter start.sh</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line"></span><br><span class="line">V=`cygpath -aw $(dirname $0)/v`</span><br><span class="line">CONTAINER=&quot;conda&quot;</span><br><span class="line">NETWORK=&quot;net&quot;</span><br><span class="line">MASTER=zk://zoo1:2181,zoo2:2181,zoo3:2181/mesos</span><br><span class="line"></span><br><span class="line">docker run \</span><br><span class="line">    -itd \</span><br><span class="line">    --hostname $&#123;CONTAINER&#125; \</span><br><span class="line">    --name $&#123;CONTAINER&#125; \</span><br><span class="line">    --network $NETWORK \</span><br><span class="line">    -v &quot;$V&quot;:/v:rw \</span><br><span class="line">    -w /v \</span><br><span class="line">    -p 127.0.0.1:8888:8888\</span><br><span class="line">    -p 4040:4040 \</span><br><span class="line">    anaconda \</span><br><span class="line">    /bin/sh -c &quot;pyspark --master mesos://$MASTER&quot;</span><br></pre></td></tr></table></figure>
+
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>系统全部跑起来，需要启动zookeeper、mesos master、mesos slave with spark和jupyter</p>
+<p>暴露的端口有</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">5051:5052:5053  3个mesos master服务</span><br><span class="line">8888            jupyter notebook</span><br><span class="line">4040            spark jobs</span><br></pre></td></tr></table></figure>
+
+<h2 id="localhost-5051"><a href="#localhost-5051" class="headerlink" title="localhost:5051"></a>localhost:5051</h2><p>访问localhost:5051可以看到</p>
+<ul>
+<li>选举出来的server是5051，是第一个mesos容器mesos1</li>
+<li>有3个agents，分别是spark的3个容器</li>
+<li>有1个framwork，是conda容器的PySparkShell，也就是跑的juypter notebook</li>
+</ul>
+<p>停止mesos1，2-3min后，可以看到选举的server变成5052</p>
+<h2 id="localhost-8888"><a href="#localhost-8888" class="headerlink" title="localhost:8888"></a>localhost:8888</h2><p>访问localhost:8888，是jupyter notebook界面，可以在其中新建一个notebook，并运行一个spark案例</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">import numpy as np</span><br><span class="line">from pyspark.mllib.stat import Statistics</span><br><span class="line">m = sc.parallelize([np.array([1.0, 20.0, 300.0]), np.array([3.0, 10.0, 200.0]), np.array([2.0, 30.0, 100.0])],2)  </span><br><span class="line">summary = Statistics.colStats(m)</span><br><span class="line"></span><br><span class="line">print(summary.mean())  # a dense vector containing the mean value for each column</span><br><span class="line">print(summary.variance())  # column-wise variance</span><br><span class="line">print(summary.numNonzeros())  # number of nonzeros in each column</span><br></pre></td></tr></table></figure>
+
+<p>如果有结果，说明安装成功。</p>
+<h2 id="localhost-4040"><a href="#localhost-4040" class="headerlink" title="localhost:4040"></a>localhost:4040</h2><p>访问localhost:4040，可以看到刚才跑的案例的分布式计算的过程。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/spark/" rel="tag"># spark</a>
+              <a href="/tags/mesos/" rel="tag"># mesos</a>
+              <a href="/tags/python/" rel="tag"># python</a>
+              <a href="/tags/zookeeper/" rel="tag"># zookeeper</a>
+              <a href="/tags/jupyter/" rel="tag"># jupyter</a>
+              <a href="/tags/conda/" rel="tag"># conda</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/03/03/spark_jupyter/" rel="prev" title="使用jupyter notebook做为spark客户端">
+      <i class="fa fa-chevron-left"></i> 使用jupyter notebook做为spark客户端
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2018/01/05/AnyOffice%E4%B8%8D%E7%99%BB%E5%BD%95%E8%BF%90%E8%A1%8C/" rel="next" title="Anyoffice不登录运行">
+      Anyoffice不登录运行 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BAzookeeper-mesos%E9%9B%86%E7%BE%A4"><span class="nav-number">1.</span> <span class="nav-text">搭建zookeeper\mesos集群</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#zookeeper-dockerfile"><span class="nav-number">1.1.</span> <span class="nav-text">zookeeper dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mesos-dockerfile"><span class="nav-number">1.2.</span> <span class="nav-text">mesos dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8zookeeper%E9%9B%86%E7%BE%A4"><span class="nav-number">1.3.</span> <span class="nav-text">启动zookeeper集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8mesos-master%E9%9B%86%E7%BE%A4"><span class="nav-number">1.4.</span> <span class="nav-text">启动mesos master集群</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8mesos%E4%B8%8A%E8%BF%90%E8%A1%8Cspark"><span class="nav-number">2.</span> <span class="nav-text">在mesos上运行spark</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#spark-dockerfile"><span class="nav-number">2.1.</span> <span class="nav-text">spark dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8spark"><span class="nav-number">2.2.</span> <span class="nav-text">启动spark</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BAjupyter"><span class="nav-number">3.</span> <span class="nav-text">搭建jupyter</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#jupyter-dockerfile"><span class="nav-number">3.1.</span> <span class="nav-text">jupyter dockerfile</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8jupyter"><span class="nav-number">3.2.</span> <span class="nav-text">启动jupyter</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%8B%E8%AF%95"><span class="nav-number">4.</span> <span class="nav-text">测试</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#localhost-5051"><span class="nav-number">4.1.</span> <span class="nav-text">localhost:5051</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#localhost-8888"><span class="nav-number">4.2.</span> <span class="nav-text">localhost:8888</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#localhost-4040"><span class="nav-number">4.3.</span> <span class="nav-text">localhost:4040</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

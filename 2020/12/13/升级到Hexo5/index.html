@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="背景升级Nodejs，结果Hexo报错，上网查了一下，原来是Nodejs版本太高。 因为懒，Hexo一直没有升过级，还是用的5年前的版本。到Hexo官网看看，最新的已经是5.1版本了，决定升级Hexo，并将过程记录如下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="升级到Hexo5">
+<meta property="og:url" content="http://lyallchan.github.io/2020/12/13/%E5%8D%87%E7%BA%A7%E5%88%B0Hexo5/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="背景升级Nodejs，结果Hexo报错，上网查了一下，原来是Nodejs版本太高。 因为懒，Hexo一直没有升过级，还是用的5年前的版本。到Hexo官网看看，最新的已经是5.1版本了，决定升级Hexo，并将过程记录如下。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-12-13T07:08:00.000Z">
+<meta property="article:modified_time" content="2020-12-14T23:27:21.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="Hexo5">
+<meta property="article:tag" content="Nodejs">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2020/12/13/%E5%8D%87%E7%BA%A7%E5%88%B0Hexo5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>升级到Hexo5 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2020/12/13/%E5%8D%87%E7%BA%A7%E5%88%B0Hexo5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          升级到Hexo5
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-12-13 15:08:00" itemprop="dateCreated datePublished" datetime="2020-12-13T15:08:00+08:00">2020-12-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-15 07:27:21" itemprop="dateModified" datetime="2020-12-15T07:27:21+08:00">2020-12-15</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>升级Nodejs，结果Hexo报错，上网查了一下，原来是Nodejs版本太高。</p>
+<p>因为懒，Hexo一直没有升过级，还是用的5年前的版本。到Hexo<a target="_blank" rel="noopener" href="http://hexo.io/">官网</a>看看，最新的已经是5.1版本了，决定升级Hexo，并将过程记录如下。</p>
+<span id="more"></span>
+
+<p>升级需求很简单，保留Next主题，保留Git发布，保留<a href="http://lyallchan.github.io/2018/02/07/%E4%BD%BF%E7%94%A8VSCode%E5%9C%A8Hexo%E4%B8%AD%E4%BD%BF%E7%94%A8%E5%9B%BE%E7%89%87/">markdown图片自动生成功能</a>。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><p>按照Hexo官网</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir Hexo5</span><br><span class="line">cd Hexo5</span><br><span class="line">npx hexo init</span><br></pre></td></tr></table></figure>
+
+<p>系统下载好hexo，初始化hexo目录，完成很顺利。</p>
+<h1 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cd Hexo5</span><br><span class="line">npm install hexo-deployer-git --save</span><br><span class="line">npm install hexo-theme-next</span><br><span class="line">npm install hexo-simple-image --save</span><br></pre></td></tr></table></figure>
+
+<p>这三个插件在hexo官网上都能找到。</p>
+<p>第一个是git发布。</p>
+<p>第二个是<a target="_blank" rel="noopener" href="https://theme-next.js.org/">next主题</a>，老版本Hexo的主题文件都在<code>theme</code>目录下，现在采用插件方式。</p>
+<p>第三个是markdown图片插件，替代了原来的<a href="http://lyallchan.github.io/2018/02/07/%E4%BD%BF%E7%94%A8VSCode%E5%9C%A8Hexo%E4%B8%AD%E4%BD%BF%E7%94%A8%E5%9B%BE%E7%89%87/">hexo-asset-image</a>。</p>
+<p>使用hexo-simple-image插件，vscode的配置稍有不同，如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;pasteImage.insertPattern&quot;: &quot;$&#123;imageSyntaxPrefix&#125;./$&#123;imageFilePath&#125;$&#123;imageSyntaxSuffix&#125;&quot;</span><br></pre></td></tr></table></figure>
+
+<p>增加了<code>./</code></p>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>主配置文件还是<code>Hexo5\_config.yml</code>，配置基本同原来配置，修改了一个地方</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">language: zh-CN</span><br></pre></td></tr></table></figure>
+
+<p>Next配置和原来不一样，原来Next是在theme目录下，改为插件以后，在node_modules目录下。按照<a target="_blank" rel="noopener" href="https://theme-next.js.org/">官网</a>配置方法，将<code>hexo5\node_modules\hexo-theme-next\_config.yml</code>文件拷贝到<code>hexo5\_config.next.yml</code>，即</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd Hexo5</span><br><span class="line">cp hexo5\node_modules\hexo-theme-next\_config.yml hexo5\_config.next.yml</span><br></pre></td></tr></table></figure>
+
+<p>修改<code>_config.netx.yml</code>，具体的配置方法可以参见<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/9f0e90cc32c2">https://www.jianshu.com/p/9f0e90cc32c2</a></p>
+<h1 id="便利"><a href="#便利" class="headerlink" title="便利"></a>便利</h1><p>总是使用<code>npx hexo</code>不方便，写了一个powershell脚本，起名<code>hexo.ps1</code>供调用</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Push-Location</span><br><span class="line">Set-Location ...\hexo5</span><br><span class="line">npx hexo $args</span><br><span class="line">Pop-Location</span><br><span class="line"></span><br><span class="line">write-host &quot;Press any key to continue...&quot;</span><br><span class="line">$null = $Host.UI.RawUI.ReadKey(&#x27;NoEcho,IncludeKeyDown&#x27;)</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Hexo5/" rel="tag"># Hexo5</a>
+              <a href="/tags/Nodejs/" rel="tag"># Nodejs</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/12/11/Excel%E6%B1%87%E6%80%BB%E6%95%B4%E4%B8%AA%E6%96%87%E4%BB%B6%E5%A4%B9%E6%95%B0%E6%8D%AE/" rel="prev" title="Excel汇总整个文件夹数据">
+      <i class="fa fa-chevron-left"></i> Excel汇总整个文件夹数据
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/24/%E5%BC%80%E6%9C%BA%E5%90%AF%E5%8A%A8WSL2%E7%9A%84SSHD%E6%9C%8D%E5%8A%A1/" rel="next" title="开机启动WSL2的SSHD服务">
+      开机启动WSL2的SSHD服务 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%92%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">插件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-number">4.</span> <span class="nav-text">配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BE%BF%E5%88%A9"><span class="nav-number">5.</span> <span class="nav-text">便利</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

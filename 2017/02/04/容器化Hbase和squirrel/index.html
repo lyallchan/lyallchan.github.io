@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="为了学习和测试Hbase，在Docker中安装Hbase Standalone和Phoenix。另外再安装GUI客户端Squirrel。上面三个组件都容器化，并实现互相访问。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="容器化Hbase standalone、Phoenix和Squirrel">
+<meta property="og:url" content="http://lyallchan.github.io/2017/02/04/%E5%AE%B9%E5%99%A8%E5%8C%96Hbase%E5%92%8Csquirrel/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="为了学习和测试Hbase，在Docker中安装Hbase Standalone和Phoenix。另外再安装GUI客户端Squirrel。上面三个组件都容器化，并实现互相访问。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-02-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-12-13T09:54:54.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="docker">
+<meta property="article:tag" content="hbase">
+<meta property="article:tag" content="squirrel">
+<meta property="article:tag" content="GUI">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2017/02/04/%E5%AE%B9%E5%99%A8%E5%8C%96Hbase%E5%92%8Csquirrel/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>容器化Hbase standalone、Phoenix和Squirrel | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2017/02/04/%E5%AE%B9%E5%99%A8%E5%8C%96Hbase%E5%92%8Csquirrel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          容器化Hbase standalone、Phoenix和Squirrel
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-02-04 00:00:00" itemprop="dateCreated datePublished" datetime="2017-02-04T00:00:00+08:00">2017-02-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 17:54:54" itemprop="dateModified" datetime="2020-12-13T17:54:54+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>为了学习和测试Hbase，在Docker中安装Hbase Standalone和Phoenix。另外再安装GUI客户端Squirrel。上面三个组件都容器化，并实现互相访问。</p>
+<span id="more"></span>
+
+<ul>
+<li><a target="_blank" rel="noopener" href="http://hbase.apache.org/">HBASE</a>：基于列的NO SQL数据库，是HADOOP重要组成部分</li>
+<li><a target="_blank" rel="noopener" href="http://phoenix.apache.org/index.html">Phoenix</a>：HBASE插件，提供HBASE的SQL操作语句，并提供JDBC接口</li>
+<li><a target="_blank" rel="noopener" href="http://squirrel-sql.sourceforge.net/">Squirrel</a>：是Phoenix主页上推荐的GUI客户端，基于JAVA编写，通过JDBC连接数据库。不仅仅用于Phoenix，也可以用于其它关系型数据库</li>
+</ul>
+<h1 id="安装Hbase和Phoenix"><a href="#安装Hbase和Phoenix" class="headerlink" title="安装Hbase和Phoenix"></a>安装Hbase和Phoenix</h1><p>先下载好Hbase和Phoenix，分别是<a target="_blank" rel="noopener" href="http://mirrors.hust.edu.cn/apache/hbase/stable/hbase-1.2.4-bin.tar.gz">hbase 1.2.4</a>和<a target="_blank" rel="noopener" href="http://mirror.bit.edu.cn/apache/phoenix/apache-phoenix-4.8.2-HBase-1.2/bin/apache-phoenix-4.8.2-HBase-1.2-bin.tar.gz">Phoenix 4.8.2</a>（对应hbase1.2版本）</p>
+<p>dockerfile</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"># standalone hbase image with phoenix</span><br><span class="line"># </span><br><span class="line"># docker build --force-rm -t hbase .</span><br><span class="line"># </span><br><span class="line"></span><br><span class="line">FROM java:on</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">ENV HBASE_VERSION 1.2.4</span><br><span class="line"></span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install python -y </span><br><span class="line"></span><br><span class="line">ADD hbase-$&#123;HBASE_VERSION&#125;-bin.tar.gz /</span><br><span class="line">RUN ln -s /hbase-$&#123;HBASE_VERSION&#125; /hbase</span><br><span class="line">ADD apache-phoenix-4.8.2-HBase-1.2-bin.tar.gz /</span><br><span class="line">RUN ln -s /apache-phoenix-4.8.2-HBase-1.2-bin /phoenix</span><br><span class="line"></span><br><span class="line">ADD hbase-site.xml /hbase/conf/</span><br><span class="line">RUN cp /phoenix/*.jar /hbase/lib/</span><br><span class="line">ENV PATH /hbase/bin:/phoenix/bin:$PATH</span><br><span class="line"></span><br><span class="line">CMD start-hbase.sh &amp;&amp; sleep 99999999</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>java:on是一个java环境</p>
+<p>python是因为phoenix的命令行客户端<code>sqlline.py</code>是基于python的，如果不需要运行，也可以不用安装</p>
+<p>hbase-site.xml参考官网<a target="_blank" rel="noopener" href="http://hbase.apache.org/book.html#quickstart">standalone</a>的配置</p>
+<p>hbase-site.xml</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;configuration&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;hbase.rootdir&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;file:///v&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">  &lt;property&gt;</span><br><span class="line">    &lt;name&gt;hbase.zookeeper.property.dataDir&lt;/name&gt;</span><br><span class="line">    &lt;value&gt;/v&lt;/value&gt;</span><br><span class="line">  &lt;/property&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="http://phoenix.apache.org/installation.html">安装phoenix</a>比较简单，只要把phoenix/lib目录下所有的jar文件拷贝到hbase/lib目录下，重启hbase服务就可以了。</p>
+<h1 id="运行Hbase"><a href="#运行Hbase" class="headerlink" title="运行Hbase"></a>运行Hbase</h1><p>start_hbase.sh</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">if ! docker network ls | grep hbase; then</span><br><span class="line">    docker network create hbase</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">docker run \</span><br><span class="line">    --volume v:/v \</span><br><span class="line">    -p 16010:16010\</span><br><span class="line">    -d \</span><br><span class="line">    --hostname hbase_standalone\</span><br><span class="line">    --name hbase_standalone \</span><br><span class="line">    --net hbase \</span><br><span class="line">    hbase</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>新增网络<code>hbase</code>，使得容器之间可以互相访问。</p>
+<blockquote>
+<p>docker1.9版本之后的网络功能大大增强，对于用户自定义网络，内置了一个DNS，在同一个网络之下，可以通过hostname相互访问，不再需要container link</p>
+</blockquote>
+<p>映射一个目录，保存hbase数据内容，这个目录对应hbase-site.xml中的hbase.rootdir</p>
+<p>暴露端口16010，hbase WEB管理页面默认端口</p>
+<p>hbase起来之后，实际上phoenix也起来了，在同一个容器里面可以运行phoenix命令行sqlline</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it hbase /phoenix/bin/sqlline.py localhost</span><br></pre></td></tr></table></figure>
+
+<p>为了测试用，也可以使用同一个镜像另起一个容器，运行sqlline</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line">    --volume sql:/sql \</span><br><span class="line">    -it \</span><br><span class="line">    --rm \</span><br><span class="line">    --hostname phoenix\</span><br><span class="line">    --name phoenix \</span><br><span class="line">    --net hbase \</span><br><span class="line">    hbase \</span><br><span class="line">    sqlline.py hbase_standalone</span><br></pre></td></tr></table></figure>
+
+<p>这里的–net hbase和hbase容器的net一致</p>
+<p>sqlline.py指向hbase主机名，hbase主机名在运行hbase容器的时候定义</p>
+<h1 id="安装Squirrel"><a href="#安装Squirrel" class="headerlink" title="安装Squirrel"></a>安装Squirrel</h1><p>基于之前的DOCKER中运行GUI程序的镜像，安装Squirrel包，并做必要的配置</p>
+<p>先将Phoenix/lib目录下的<code>phoenix-4.8.2-HBase-1.2-client.jar</code>拷贝出来，这是phoenix客户端组件，需要加载到squirrel目录中</p>
+<p>dockerfile</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># squirrel: hbase phonix client based on xcfe4:on</span><br><span class="line"># </span><br><span class="line"># docker build --force-rm -t squirrel .</span><br><span class="line"></span><br><span class="line">FROM xcfe4:on</span><br><span class="line">MAINTAINER lyalchan &quot;lyallchan@163.com&quot;</span><br><span class="line"></span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install -y openjdk-8-jre</span><br><span class="line"></span><br><span class="line">ENV VERSION 3.7.1</span><br><span class="line"></span><br><span class="line">COPY squirrel.xml /</span><br><span class="line">COPY squirrel-sql-$VERSION-standard.jar /</span><br><span class="line"></span><br><span class="line">RUN java -jar /squirrel-sql-$VERSION-standard.jar /squirrel.xml</span><br><span class="line">COPY phoenix-4.8.2-HBase-1.2-client.jar /squirrel/lib/</span><br><span class="line"></span><br><span class="line">RUN cp -R root  root.backup</span><br></pre></td></tr></table></figure>
+
+<p>xcfe4:on是自制的一个运行GUI应用程序的基础镜像，包括中文输入法</p>
+<p>squirrel.xml是安装squirrel时的配置文件</p>
+<blockquote>
+<p>squirrel通过<code>java -jar</code>安装，安装过程中，会和你交互回答很多配置项,这个文件回答了这些配置，实现自动安装</p>
+</blockquote>
+<p>将phoenix客户端组件<code>phoenix-4.8.2-HBase-1.2-client.jar</code>放到/squirrel/lib目录</p>
+<p>将root用户的配置备份出来，运行时要用到</p>
+<h1 id="运行Squirrel"><a href="#运行Squirrel" class="headerlink" title="运行Squirrel"></a>运行Squirrel</h1><p>start_squirrel.sh</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh </span><br><span class="line"></span><br><span class="line">C_NAME=&quot;squirrel&quot;</span><br><span class="line">V=`cygpath -aw $(dirname $0)/v`</span><br><span class="line">NETWORK=&quot;hbase&quot;</span><br><span class="line"></span><br><span class="line">if ! docker network ls | grep $NETWORK; then</span><br><span class="line">    echo start hbase first. quitting...</span><br><span class="line">    exit 127</span><br><span class="line">fi </span><br><span class="line"></span><br><span class="line">if ! ps | grep xinit ; then</span><br><span class="line">    tmux new-session -d -s xwin startxwin</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">D=10.0.75.1$DISPLAY</span><br><span class="line">xhost + </span><br><span class="line"></span><br><span class="line">docker run \</span><br><span class="line">    -itd \</span><br><span class="line">    --volume $V:/root:rw \</span><br><span class="line">    -e DISPLAY=$D \</span><br><span class="line">    --net $NETWORK \</span><br><span class="line">    --rm \</span><br><span class="line">    --hostname $C_NAME\</span><br><span class="line">    --name $C_NAME \</span><br><span class="line">    $C_NAME \</span><br><span class="line">    bash -c &quot;fcitx; startxfce4&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>运行squirrel，先要运行hbase和xwin</p>
+<p>再设置DISPLAY环境变量传到容器中，10.0.75.1是本机DOCKER的网桥地址</p>
+<p>DOCKER RUN的时候将root目录映射出来，很多squirrel的配置都要保存下来，–net要和hbase的net一致，保证squirrel可以访问到hbase，启动输入法fcitx和桌面xcfe4，这两个程序都安装在xcfe4:on镜像中。</p>
+<p>拉起桌面以后，先将/root.backup中的配置拷贝回/root，这个动作只要做一次就够了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker exec squirrel cp -R /root.backup/* /root/</span><br><span class="line">或者</span><br><span class="line">docker cp squirrel:/root.backup/* v</span><br></pre></td></tr></table></figure>
+
+<p>启动squirrel</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec squirrel /squirrel/squirrel-start.sh</span><br></pre></td></tr></table></figure>
+
+<p>按照phoenix文档配置squirrel</p>
+<blockquote>
+<ol>
+<li>新增Driver(Drivers -&gt; New Drvier)</li>
+<li>在”Add Driver”对话框中，设置”Name”为”Phoenix”，”Example URL”为”jdbc:phoenix:localhost”</li>
+<li>在同一个对话框，设置”Class Name”为”org.apache.phoenix.jdbc.PhoenixDriver”</li>
+<li>新增Alias(Aliases -&gt; New Aliases)</li>
+<li>在对话框中，”Name”设置为”Hbase_standalone”, “Driver”设置为”Phoenix”, “User Name”和”Password”留空</li>
+<li>URL设置为”jdbc:phoenix:hbase_standalone”，其中hbase_standalone为hbase的主机名</li>
+<li>测试，通过后按”OK”关闭对话框</li>
+<li>双击新增的alias，连接数据库即可</li>
+</ol>
+</blockquote>
+<p>关闭squerrel容器后，所有配置都保存在当前目录的”./v”目录下，这个目录映射为容器内的”/root”目录</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ol>
+<li><p>hbase官方网站、下载页面和standalone配置</p>
+<p> <a target="_blank" rel="noopener" href="http://hbase.apache.org/">http://hbase.apache.org</a></p>
+<p> <a target="_blank" rel="noopener" href="http://www.apache.org/dyn/closer.cgi/hbase">http://www.apache.org/dyn/closer.cgi/hbase</a></p>
+<p> <a target="_blank" rel="noopener" href="http://hbase.apache.org/book.html#quickstart">http://hbase.apache.org/book.html#quickstart</a></p>
+</li>
+<li><p>phoenix官方网站、下载页面和安装指导，安装指导中包括了squirrel配置</p>
+<p> <a target="_blank" rel="noopener" href="http://phoenix.apache.org/index.html">http://phoenix.apache.org/index.html</a></p>
+<p> <a target="_blank" rel="noopener" href="http://www.apache.org/dyn/closer.lua/phoenix/">http://www.apache.org/dyn/closer.lua/phoenix/</a></p>
+<p> <a target="_blank" rel="noopener" href="http://phoenix.apache.org/installation.html">http://phoenix.apache.org/installation.html</a></p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/docker/" rel="tag"># docker</a>
+              <a href="/tags/hbase/" rel="tag"># hbase</a>
+              <a href="/tags/squirrel/" rel="tag"># squirrel</a>
+              <a href="/tags/GUI/" rel="tag"># GUI</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017/02/02/Win10%E4%B8%8B%E4%BD%BF%E7%94%A8cygwinX%20server%E8%BF%90%E8%A1%8Clinux%E5%AE%B9%E5%99%A8%E6%A1%8C%E9%9D%A2%EF%BC%8C%E5%B9%B6%E5%AE%9E%E7%8E%B0%E4%B8%AD%E6%96%87%E8%BE%93%E5%85%A5/" rel="prev" title="Win10下使用cygwinX server运行linux容器桌面，并实现中文输入">
+      <i class="fa fa-chevron-left"></i> Win10下使用cygwinX server运行linux容器桌面，并实现中文输入
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/02/19/Keepass%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" rel="next" title="Keepass使用记录">
+      Keepass使用记录 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Hbase%E5%92%8CPhoenix"><span class="nav-number">1.</span> <span class="nav-text">安装Hbase和Phoenix</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%90%E8%A1%8CHbase"><span class="nav-number">2.</span> <span class="nav-text">运行Hbase</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Squirrel"><span class="nav-number">3.</span> <span class="nav-text">安装Squirrel</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%90%E8%A1%8CSquirrel"><span class="nav-number">4.</span> <span class="nav-text">运行Squirrel</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

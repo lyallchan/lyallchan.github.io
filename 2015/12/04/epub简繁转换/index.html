@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="epub繁体书转换成简体书">
+<meta property="og:type" content="article">
+<meta property="og:title" content="epub简繁转换">
+<meta property="og:url" content="http://lyallchan.github.io/2015/12/04/epub%E7%AE%80%E7%B9%81%E8%BD%AC%E6%8D%A2/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="epub繁体书转换成简体书">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2015-12-04T08:31:06.000Z">
+<meta property="article:modified_time" content="2023-12-01T10:15:33.028Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="epub">
+<meta property="article:tag" content="简繁">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2015/12/04/epub%E7%AE%80%E7%B9%81%E8%BD%AC%E6%8D%A2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>epub简繁转换 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2015/12/04/epub%E7%AE%80%E7%B9%81%E8%BD%AC%E6%8D%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          epub简繁转换
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2015-12-04 16:31:06" itemprop="dateCreated datePublished" datetime="2015-12-04T16:31:06+08:00">2015-12-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2023-12-01 18:15:33" itemprop="dateModified" datetime="2023-12-01T18:15:33+08:00">2023-12-01</time>
+              </span>
+
+          
+            <div class="post-description">epub繁体书转换成简体书</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="epub繁体书转换成简体书"><a href="#epub繁体书转换成简体书" class="headerlink" title="epub繁体书转换成简体书"></a>epub繁体书转换成简体书</h1><p>找到一个项目<a target="_blank" rel="noopener" href="http://blog.jjgod.org/2013/01/31/opf-cc/">opf-cc</a>，python编写的，可以直接转换。</p>
+<p>项目代码托管在<a target="_blank" rel="noopener" href="https://github.com/jjgod/opf-cc">github</a>。</p>
+<h1 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h1><ul>
+<li>项目依赖<a target="_blank" rel="noopener" href="https://github.com/BYVoid/OpenCC.git">opencc</a>，作者建议从git源码编译opencc</li>
+<li>lxml，从pip install安装</li>
+<li>而编译opencc时，又要使用cmake和doxygen，这两个都可以从cygwin setup安装</li>
+</ul>
+<h2 id="安装opf-cc"><a href="#安装opf-cc" class="headerlink" title="安装opf-cc"></a>安装opf-cc</h2><p><code>opf-cc</code>本身直接git clone就行。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span></span><br><span class="line"><span class="built_in">cd</span> bin</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/jjgod/opf-cc.git</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装opencc"><a href="#安装opencc" class="headerlink" title="安装opencc"></a>安装opencc</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span></span><br><span class="line"><span class="built_in">cd</span> bin</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/BYVoid/OpenCC.git</span><br><span class="line"><span class="built_in">cd</span> OpenCC</span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+
+<h2 id="安装lxml"><a href="#安装lxml" class="headerlink" title="安装lxml"></a>安装lxml</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install lxml</span><br></pre></td></tr></table></figure>
+
+<h2 id="找不到libxml2"><a href="#找不到libxml2" class="headerlink" title="找不到libxml2"></a>找不到libxml2</h2><p>安装lxml的时候，系统报错，提示没有libxml2的头文件，直接从cygwin的setup安装</p>
+<p>选择的时候，要选择两个软件<code>libxml2</code>和<code>libxslt</code>，并且在lib分支下，选择<code>runtime</code>和<code>develop</code>两个版本</p>
+<h2 id="找不到pyconfig-h"><a href="#找不到pyconfig-h" class="headerlink" title="找不到pyconfig.h"></a>找不到pyconfig.h</h2><p>pyconfig.h包含在python的安装包中，实际已经安装，在<code>/usr/include/python2.7</code>目录下，但是gcc编译命令中，-I包括的路径为<code>/include/python2.7</code>，</p>
+<p>做了个软链接解决</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ln</span> -s /usr/include include</span><br></pre></td></tr></table></figure>
+
+<h2 id="找不到iconv-h"><a href="#找不到iconv-h" class="headerlink" title="找不到iconv.h"></a>找不到iconv.h</h2><p>iconv包含在libiconv-devel中，实际已经安装，不知道什么原因丢失了。cygwin setup重新reinstall即可。</p>
+<h2 id="找不到cmake或者cmake提示CMAKR-ROOT找不到"><a href="#找不到cmake或者cmake提示CMAKR-ROOT找不到" class="headerlink" title="找不到cmake或者cmake提示CMAKR_ROOT找不到"></a>找不到cmake或者cmake提示CMAKR_ROOT找不到</h2><p>cygwin setup安装cmake</p>
+<p>找到Makefile文件，将cmake命令指定全路径<code>/usr/bin/cmake</code></p>
+<h2 id="找不到cygopencc-2-dll"><a href="#找不到cygopencc-2-dll" class="headerlink" title="找不到cygopencc-2.dll"></a>找不到cygopencc-2.dll</h2><p>编译opencc时，会提示找不到cygopencc-2.dll，实际文件在<code>opencc/build</code>目录下，拷贝一份到<code>c:\windows\system32</code>下即可</p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">~/bin/opf-cc/opf-cc.py file.epub</span><br></pre></td></tr></table></figure>
+
+<p>或者批量转换</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> *.epub; <span class="keyword">do</span> ~bin/opf-cc/opf-cc.py <span class="string">&quot;<span class="variable">$i</span>&quot;</span>; <span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/epub/" rel="tag"># epub</a>
+              <a href="/tags/%E7%AE%80%E7%B9%81/" rel="tag"># 简繁</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2015/12/04/opensuse%E5%AE%89%E8%A3%85apache/" rel="prev" title="opensuse安装apache">
+      <i class="fa fa-chevron-left"></i> opensuse安装apache
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2015/12/04/apache%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86tomcat%EF%BC%8C%E9%85%8D%E7%BD%AEsession%E4%BF%9D%E6%8C%81/" rel="next" title="apache反向代理tomcat，配置session保持">
+      apache反向代理tomcat，配置session保持 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#epub%E7%B9%81%E4%BD%93%E4%B9%A6%E8%BD%AC%E6%8D%A2%E6%88%90%E7%AE%80%E4%BD%93%E4%B9%A6"><span class="nav-number">1.</span> <span class="nav-text">epub繁体书转换成简体书</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85opf-cc"><span class="nav-number">2.1.</span> <span class="nav-text">安装opf-cc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85opencc"><span class="nav-number">2.2.</span> <span class="nav-text">安装opencc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85lxml"><span class="nav-number">2.3.</span> <span class="nav-text">安装lxml</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%BE%E4%B8%8D%E5%88%B0libxml2"><span class="nav-number">2.4.</span> <span class="nav-text">找不到libxml2</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%BE%E4%B8%8D%E5%88%B0pyconfig-h"><span class="nav-number">2.5.</span> <span class="nav-text">找不到pyconfig.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%BE%E4%B8%8D%E5%88%B0iconv-h"><span class="nav-number">2.6.</span> <span class="nav-text">找不到iconv.h</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%BE%E4%B8%8D%E5%88%B0cmake%E6%88%96%E8%80%85cmake%E6%8F%90%E7%A4%BACMAKR-ROOT%E6%89%BE%E4%B8%8D%E5%88%B0"><span class="nav-number">2.7.</span> <span class="nav-text">找不到cmake或者cmake提示CMAKR_ROOT找不到</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%BE%E4%B8%8D%E5%88%B0cygopencc-2-dll"><span class="nav-number">2.8.</span> <span class="nav-text">找不到cygopencc-2.dll</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">使用</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

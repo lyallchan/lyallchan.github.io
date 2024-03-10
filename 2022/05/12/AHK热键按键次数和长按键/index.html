@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="AHK热键按键次数和长按键写了一个函数，返回热键的按键次数和是否长按键，可以在脚本中调用。 12345678KeyCounter(Key, Func, param, Timeout)返回 ： 热键按键次数，如果是长按键，返回100入参 ：    Key : 热键，可以省略，默认为A_ThisHotKey    Func ：长按键时调用的函数，可以省略，不能为空字符串    Param ：Func的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AHK热键按键次数和长按键">
+<meta property="og:url" content="http://lyallchan.github.io/2022/05/12/AHK%E7%83%AD%E9%94%AE%E6%8C%89%E9%94%AE%E6%AC%A1%E6%95%B0%E5%92%8C%E9%95%BF%E6%8C%89%E9%94%AE/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="AHK热键按键次数和长按键写了一个函数，返回热键的按键次数和是否长按键，可以在脚本中调用。 12345678KeyCounter(Key, Func, param, Timeout)返回 ： 热键按键次数，如果是长按键，返回100入参 ：    Key : 热键，可以省略，默认为A_ThisHotKey    Func ：长按键时调用的函数，可以省略，不能为空字符串    Param ：Func的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-12T07:45:00.000Z">
+<meta property="article:modified_time" content="2022-05-12T14:15:07.952Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="AHK">
+<meta property="article:tag" content="按键次数">
+<meta property="article:tag" content="长按键">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2022/05/12/AHK%E7%83%AD%E9%94%AE%E6%8C%89%E9%94%AE%E6%AC%A1%E6%95%B0%E5%92%8C%E9%95%BF%E6%8C%89%E9%94%AE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>AHK热键按键次数和长按键 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2022/05/12/AHK%E7%83%AD%E9%94%AE%E6%8C%89%E9%94%AE%E6%AC%A1%E6%95%B0%E5%92%8C%E9%95%BF%E6%8C%89%E9%94%AE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          AHK热键按键次数和长按键
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2022-05-12 15:45:00 / 修改时间：22:15:07" itemprop="dateCreated datePublished" datetime="2022-05-12T15:45:00+08:00">2022-05-12</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="AHK热键按键次数和长按键"><a href="#AHK热键按键次数和长按键" class="headerlink" title="AHK热键按键次数和长按键"></a>AHK热键按键次数和长按键</h1><p>写了一个函数，返回热键的按键次数和是否长按键，可以在脚本中调用。</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">KeyCounter(Key, Func, param, Timeout)</span><br><span class="line"></span><br><span class="line">返回 ： 热键按键次数，如果是长按键，返回<span class="number">100</span></span><br><span class="line">入参 ：</span><br><span class="line"><span class="title">    Key :</span> 热键，可以省略，默认为<span class="built_in">A_ThisHotKey</span></span><br><span class="line">    Func ：长按键时调用的函数，可以省略，不能为空字符串</span><br><span class="line">    Param ：Func的参数，可以省略</span><br><span class="line">    Timeout ： 超时时间，可以省略，默认<span class="number">500</span>ms</span><br></pre></td></tr></table></figure>
+
+<span id="more"></span>
+
+<blockquote>
+<p>说明：这个函数支持单个按键、有修饰键（Ctrl、Alt、Shift、Win）的组合按键。不支持形如<code>a &amp; b</code>自定义组合键。<br>有修饰键的组合按键场景，如<code>CTRL-T</code>，支持按住<code>CTRL</code>键，返回<code>T</code>键的按键次数，即按住<code>CTRL-T</code>、按住<code>CTRL</code>不放，再按<code>T</code>键，返回按键次数2，不支持<code>CTRL-T</code>，松开<code>CTRL</code>，再按一次<code>CTRL-T</code>的场景。</p>
+</blockquote>
+<p>使用案例</p>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">$F1::</span> </span><br><span class="line">    Switch KeyCounter()</span><br><span class="line">    &#123;</span><br><span class="line"><span class="title">        Case 1 :</span> Tooltip, 按键一次</span><br><span class="line"><span class="title">        Case 2 :</span> Tooltip, 按键两次</span><br><span class="line"><span class="title">        Case 3 :</span> Tooltip, 按键三次</span><br><span class="line"><span class="title">        Case 100 :</span> Tooltip, 长按键</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">Return</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Func参数说明：<br>传入的Func在长按键按下已超时，未弹起时调用<br>如果判断KeyCounter的返回值等于100，再调用函数，则要等到长按键弹起时才能调用<br>推荐使用传入Func方式，这样用户感知更加好</p>
+</blockquote>
+<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="title">$F1::</span> </span><br><span class="line">    Switch KeyCounter(, <span class="string">&quot;Func_long&quot;</span>)</span><br><span class="line">    &#123;</span><br><span class="line"><span class="title">        Case 1 :</span> Tooltip, 按键一次</span><br><span class="line"><span class="title">        Case 2 :</span> Tooltip, 按键两次</span><br><span class="line"><span class="title">        Case 3 :</span> Tooltip, 按键三次</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">Return</span></span><br><span class="line"></span><br><span class="line">Func_long()</span><br><span class="line">&#123;</span><br><span class="line"><span class="built_in">    Tooltip,</span> 长按键，按键未弹</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">KeyCounter(Key:=<span class="string">&quot;&quot;</span>, Func:=<span class="string">&quot;IsFunc&quot;</span>, param:=<span class="string">&quot;&quot;</span>, Timeout:=<span class="number">500</span>)</span><br><span class="line">&#123;</span><br><span class="line"><span class="title">    OldKey := Key ? Key :</span> <span class="built_in">A_ThisHotKey</span></span><br><span class="line">    Key := RegExReplace(OldKey, <span class="string">&quot;[\^!#+$~]&quot;</span>) <span class="comment">;; 移除热键修饰符</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">;; 等待按键弹起或者按键超时</span></span><br><span class="line">    <span class="comment">;; 如果按键弹起，认为是短按键</span></span><br><span class="line">    <span class="comment">;; 如果按键超时，认为是长按键</span></span><br><span class="line">    Loop </span><br><span class="line">    &#123;</span><br><span class="line"><span class="built_in">        sleep,</span> <span class="number">20</span></span><br><span class="line">        state:=GetKeyState(Key,<span class="string">&quot;P&quot;</span>)</span><br><span class="line">    &#125; <span class="keyword">Until</span>    state=<span class="number">0</span>  <span class="comment">;; 按键已弹起</span></span><br><span class="line">            || <span class="built_in">A_TimeSinceThisHotKey</span>&gt;Timeout <span class="comment">;; 按键已超时</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">;; 分别处理短按键和长按键</span></span><br><span class="line">    if(state=<span class="number">0</span>) <span class="comment">;; 短按键</span></span><br><span class="line">    &#123;</span><br><span class="line">        count:=<span class="number">1</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">;; 继续等待按键按下，</span></span><br><span class="line">        <span class="comment">;; 如果等到按键，则按键次数加1</span></span><br><span class="line">        <span class="comment">;; 如果没有等到按键，返回按键次数，跳出循环</span></span><br><span class="line">        Loop</span><br><span class="line">        &#123;</span><br><span class="line"><span class="built_in">            KeyWait,</span> <span class="variable">%Key%</span>, D T0.<span class="number">2</span> <span class="comment">; 继续等待按键按下,0.2s超时</span></span><br><span class="line">            if (<span class="built_in">ErrorLevel</span>=<span class="number">0</span>) <span class="comment">;; 等到按键</span></span><br><span class="line">            &#123;</span><br><span class="line"><span class="built_in">                KeyWait,</span> <span class="variable">%Key%</span></span><br><span class="line">                count++</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">Until</span> <span class="built_in">ErrorLevel</span> = <span class="number">1</span> <span class="comment">;; 没有按键按下</span></span><br><span class="line">        Rtn := count</span><br><span class="line">    &#125;</span><br><span class="line">    else <span class="comment">;; 长按键</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="variable">%Func%</span>(param)</span><br><span class="line"><span class="built_in">        KeyWait,</span> <span class="variable">%Key%</span> <span class="comment">;; 等待按键弹起</span></span><br><span class="line">        Rtn := <span class="number">100</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">Return</span> Rtn</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="逻辑"><a href="#逻辑" class="headerlink" title="逻辑"></a>逻辑</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">0. 按下热键</span><br><span class="line">1. 等待按键弹起或者超时还没有弹起</span><br><span class="line">2. 如果按键弹起，认为是短按键，如果按键超时还没有弹起，认为是长按键</span><br><span class="line">    3. 如果是短按键，继续等待按下热键</span><br><span class="line">        4. 如果等到热键按下，则按键次数加1</span><br><span class="line">        5. 如果没有等到热键按下，则返回按键次数</span><br><span class="line">    6. 如果是长按键</span><br><span class="line">        7. 执行长按键函数</span><br><span class="line">        8. 返回长按键代码100</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/AHK/" rel="tag"># AHK</a>
+              <a href="/tags/%E6%8C%89%E9%94%AE%E6%AC%A1%E6%95%B0/" rel="tag"># 按键次数</a>
+              <a href="/tags/%E9%95%BF%E6%8C%89%E9%94%AE/" rel="tag"># 长按键</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2022/04/28/AHK%E8%BE%93%E5%87%BA%E5%88%B0%E5%BD%93%E5%89%8D%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="prev" title="AHK输出到当前命令行">
+      <i class="fa fa-chevron-left"></i> AHK输出到当前命令行
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AHK%E7%83%AD%E9%94%AE%E6%8C%89%E9%94%AE%E6%AC%A1%E6%95%B0%E5%92%8C%E9%95%BF%E6%8C%89%E9%94%AE"><span class="nav-number">1.</span> <span class="nav-text">AHK热键按键次数和长按键</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%BB%E8%BE%91"><span class="nav-number">3.</span> <span class="nav-text">逻辑</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

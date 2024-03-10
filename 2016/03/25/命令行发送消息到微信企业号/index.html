@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="[TOC] 日常有几个URL需要监控是否可达，由于比较简单，自己写了个脚本，使用curl查询URL是否可用。如果不可用，需要发送邮件、短信、微信等方式通知。 发送邮件方式很多，现在的手机APP和邮箱也都能做到有了邮件实时提醒。比如163和邮箱大师，发送邮件给163，邮箱大师可以做到实时提醒，做为通知的首选方式。 发送短信需要短信网关，也要收费，不可行。 发送微信，查了很多资料，公众号和订阅号发送条">
+<meta property="og:type" content="article">
+<meta property="og:title" content="命令行发送消息到微信企业号">
+<meta property="og:url" content="http://lyallchan.github.io/2016/03/25/%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF%E5%88%B0%E5%BE%AE%E4%BF%A1%E4%BC%81%E4%B8%9A%E5%8F%B7/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="[TOC] 日常有几个URL需要监控是否可达，由于比较简单，自己写了个脚本，使用curl查询URL是否可用。如果不可用，需要发送邮件、短信、微信等方式通知。 发送邮件方式很多，现在的手机APP和邮箱也都能做到有了邮件实时提醒。比如163和邮箱大师，发送邮件给163，邮箱大师可以做到实时提醒，做为通知的首选方式。 发送短信需要短信网关，也要收费，不可行。 发送微信，查了很多资料，公众号和订阅号发送条">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-03-25T02:10:00.000Z">
+<meta property="article:modified_time" content="2020-12-13T09:54:54.000Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="命令行">
+<meta property="article:tag" content="微信">
+<meta property="article:tag" content="告警">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2016/03/25/%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF%E5%88%B0%E5%BE%AE%E4%BF%A1%E4%BC%81%E4%B8%9A%E5%8F%B7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>命令行发送消息到微信企业号 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2016/03/25/%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%8F%91%E9%80%81%E6%B6%88%E6%81%AF%E5%88%B0%E5%BE%AE%E4%BF%A1%E4%BC%81%E4%B8%9A%E5%8F%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          命令行发送消息到微信企业号
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-03-25 10:10:00" itemprop="dateCreated datePublished" datetime="2016-03-25T10:10:00+08:00">2016-03-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-13 17:54:54" itemprop="dateModified" datetime="2020-12-13T17:54:54+08:00">2020-12-13</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>[TOC]</p>
+<p>日常有几个URL需要监控是否可达，由于比较简单，自己写了个脚本，使用<code>curl</code>查询URL是否可用。如果不可用，需要发送邮件、短信、微信等方式通知。</p>
+<p>发送邮件方式很多，现在的手机APP和邮箱也都能做到有了邮件实时提醒。比如163和邮箱大师，发送邮件给163，邮箱大师可以做到实时提醒，做为通知的首选方式。</p>
+<p>发送短信需要短信网关，也要收费，不可行。</p>
+<p>发送微信，查了很多资料，公众号和订阅号发送条数为个位数，不够用。微信企业号有人数限制，每天发送的信息为人数*30条/天，可以试一下。</p>
+<span id="more"></span>
+<h1 id="申请微信企业号"><a href="#申请微信企业号" class="headerlink" title="申请微信企业号"></a>申请微信企业号</h1><p><a target="_blank" rel="noopener" href="http://qy.weixin.qq.com/">微信企业号官网</a> 申请，注意一个账号只能申请公众号、订阅号、企业号其中一种，并且申请好了，就不能更改，这里一定要申请企业号。</p>
+<p>申请的时候，要你提供组织代码证明，个人的应用，没有，选择最后一项，民间组织，只要提供身份证号以及手机验证就可以了。</p>
+<h1 id="新建一个应用、配置以及必须的参数"><a href="#新建一个应用、配置以及必须的参数" class="headerlink" title="新建一个应用、配置以及必须的参数"></a>新建一个应用、配置以及必须的参数</h1><p>申请好企业号以后，看起来企业号的应用模型是这样的：</p>
+<ul>
+<li><p>一个企业号对应多个应用</p>
+</li>
+<li><p>一个企业号对应一个组织（通信录），一个组织下可以有部门，每个部门里面有个人，每个个人可以有标签（TAG）</p>
+</li>
+<li><p>一个应用可以指定管理员，可以指定部门或者标签下的个人访问</p>
+<p>在应用中心新建一个应用，选择<code>消息型应用</code>，可以接受微信消息，填好应用名称等必要的参数，指定可以访问的部门或者标签，应用就建好了。</p>
+<p>在<code>设置 - 权限管理</code>新建管理组，管理刚才应用的权限。命令行发消息的时候，也是使用这个权限进行发送的。最低的权限是对通信录有查看的权限，对应用有发消息的权限。</p>
+</li>
+</ul>
+<p>必要的参数：</p>
+<ul>
+<li><p>在权限管理界面，记录下<code>corpid</code>和<code>secret</code></p>
+</li>
+<li><p>在应用中心点击刚建好的应用，记录下<code>应用ID</code></p>
+</li>
+<li><p>如果发消息给指定的人员（部门或者标签），在通信录中，记下标签的<code>ID</code>或者部门的<code>ID</code></p>
+<h1 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h1><p>接口文档地址<a target="_blank" rel="noopener" href="http://qydev.weixin.qq.com/wiki/index.php?title=%E9%A6%96%E9%A1%B5">http://qydev.weixin.qq.com/wiki/index.php?title=%E9%A6%96%E9%A1%B5</a></p>
+<p>使用建立连接和发送消息两个功能。</p>
+<p>建立连接采用主动调用模式，发送消息为发送文本消息。</p>
+<p>大致流程为：</p>
+</li>
+</ul>
+<ol>
+<li><p>通过corpid和secret，建立连接，取得access token。JSON格式，GET方法</p>
+</li>
+<li><p>通过access token，POST一个JSON数据，JSON数据包括发送对象、发送内容、应用ID，返回也为一个JSON包，包含errcode和errmsg，返回也为一个JSON包，包含errcode和errmsg</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>使用SHELL编写脚本，用到两个工具<code>curl</code>和<code>jq</code>。<br><code>jq</code>用来处理JSON格式的数据，官方网站为<a target="_blank" rel="noopener" href="https://stedolan.github.io/jq/%E3%80%82">https://stedolan.github.io/jq/。</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">URL_GET_TOKEN=&quot;https://qyapi.weixin.qq.com/cgi-bin/gettoken&quot;</span><br><span class="line">URL_SEND_MSG=&quot;https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token=&quot;</span><br><span class="line">CORP_ID=&quot;XXXXXXXXXXXXXX&quot;</span><br><span class="line">SECRET=&quot;XXXXXXXXXXXXXXX&quot;</span><br><span class="line">TOTAG=1</span><br><span class="line">AGENTID=2</span><br><span class="line"> </span><br><span class="line">MSG=&#x27;&#123;&#x27;</span><br><span class="line">MSG=$MSG&#x27;&quot;totag&quot;:&quot;&#x27;$TOTAG&#x27;&quot;,&#x27;</span><br><span class="line">MSG=$MSG&#x27;&quot;text&quot;:&#123;&quot;content&quot;:&quot;&#x27;$1&#x27;&quot;&#125;,&#x27;</span><br><span class="line">MSG=$MSG&#x27;&quot;safe&quot;:&quot;0&quot;,&#x27;</span><br><span class="line">MSG=$MSG&#x27;&quot;agentid&quot;:&#x27;$AGENTID&#x27;,&#x27;</span><br><span class="line">MSG=$MSG&#x27;&quot;msgtype&quot;:&quot;text&quot;&#x27;</span><br><span class="line">MSG=$MSG&#x27;&#125;&#x27;</span><br><span class="line"> </span><br><span class="line">TOKEN=$(curl -s &quot;$URL_GET_TOKEN?corpid=$CORP_ID&amp;corpsecret=$SECRET&quot; | jq -r .access_token)</span><br><span class="line"> </span><br><span class="line">if [ -z $TOKEN ]; then</span><br><span class="line">    echo Get token error, maybe network issue</span><br><span class="line">    exit 100</span><br><span class="line">fi</span><br><span class="line"> </span><br><span class="line">return=$(curl -s -X POST -d &quot;$MSG&quot; $URL_SEND_MSG$TOKEN)</span><br><span class="line"> </span><br><span class="line">if [ -z &quot;$return&quot; ]; then</span><br><span class="line">    echo Send msg error, maybe network issue</span><br><span class="line">    exit 101</span><br><span class="line">else</span><br><span class="line">    errcode=$(echo $return | jq -r .errcode)</span><br><span class="line">    if [[ $errcode -ne 0 ]]; then</span><br><span class="line">        errmsg=$(echo $return | jq -r .errmsg)</span><br><span class="line">        echo Send msg error, with error $errcode: $errmsg</span><br><span class="line">        exit 102</span><br><span class="line">    else</span><br><span class="line">        echo ok</span><br><span class="line">    fi</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p>第一个curl使用GET方法取得TOKEN，直接在URL中拼装corpid和corpsecret，返回JSON格式，用jq取得access_token。<br>第二个curl使用POST发送消息，在URL中拼装token，在-d参数中发送JSON数据。<br>MSG为发送消息的JSON包，包括了发送对象<code>totag</code>，发送消息<code>text</code>，应用ID<code>agentid</code>，<code>safe</code>和<code>msgtype</code>为固定值。<br>发送好以后，校验返回值，如果为空，说明URL没有访问到，如果不为空，<code>jq</code>取得errcode，errcode为0，说明发送成功，errcode不为0，说明发送不成功，打印errcode和errmsg。</p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%91%BD%E4%BB%A4%E8%A1%8C/" rel="tag"># 命令行</a>
+              <a href="/tags/%E5%BE%AE%E4%BF%A1/" rel="tag"># 微信</a>
+              <a href="/tags/%E5%91%8A%E8%AD%A6/" rel="tag"># 告警</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/02/17/%E4%BD%BF%E7%94%A8monit%E7%9B%91%E6%8E%A7URL/" rel="prev" title="使用monit监控URL">
+      <i class="fa fa-chevron-left"></i> 使用monit监控URL
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/03/28/%E4%B8%BATotalcmd%E5%A2%9E%E5%8A%A0Cygwin_Prompt_Here%E5%8A%9F%E8%83%BD/" rel="next" title="为Totalcmd增加Cygwin Prompt Here功能">
+      为Totalcmd增加Cygwin Prompt Here功能 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%B3%E8%AF%B7%E5%BE%AE%E4%BF%A1%E4%BC%81%E4%B8%9A%E5%8F%B7"><span class="nav-number">1.</span> <span class="nav-text">申请微信企业号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%B0%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%BA%94%E7%94%A8%E3%80%81%E9%85%8D%E7%BD%AE%E4%BB%A5%E5%8F%8A%E5%BF%85%E9%A1%BB%E7%9A%84%E5%8F%82%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">新建一个应用、配置以及必须的参数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%A5%E5%8F%A3"><span class="nav-number">3.</span> <span class="nav-text">接口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">4.</span> <span class="nav-text">实现</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">117</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
