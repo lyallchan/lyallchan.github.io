@@ -20,19 +20,25 @@
     var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
   </script>
 
-  <meta name="description" content="快捷指令抓取网页到Obsidian苹果手机共享到 [[Obsidian]]，只能抓取URL链接，不能抓取文章。看到利用ios指令提升移动端obsidian使用体验，可以使用[[快捷指令]]自动化抓取网页内容，就动手试了一下，其中的坑很多，文章里面也没有说清楚，这里做了记录。">
+  <meta name="description" content="快捷指令抓取网页到Obsidian苹果手机共享到 Obsidian，只能抓取URL链接，不能抓取文章。看到利用ios指令提升移动端obsidian使用体验，可以使用快捷指令自动化抓取网页内容，就动手试了一下，其中的坑很多，文章里面也没有说清楚，这里做了记录。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="快捷指令抓取网页到Obsidian">
 <meta property="og:url" content="http://lyallchan.github.io/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/index.html">
 <meta property="og:site_name" content="折腾手记">
-<meta property="og:description" content="快捷指令抓取网页到Obsidian苹果手机共享到 [[Obsidian]]，只能抓取URL链接，不能抓取文章。看到利用ios指令提升移动端obsidian使用体验，可以使用[[快捷指令]]自动化抓取网页内容，就动手试了一下，其中的坑很多，文章里面也没有说清楚，这里做了记录。">
+<meta property="og:description" content="快捷指令抓取网页到Obsidian苹果手机共享到 Obsidian，只能抓取URL链接，不能抓取文章。看到利用ios指令提升移动端obsidian使用体验，可以使用快捷指令自动化抓取网页内容，就动手试了一下，其中的坑很多，文章里面也没有说清楚，这里做了记录。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://lyallchan.github.io/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171029785.jpg">
+<meta property="og:image" content="http://lyallchan.github.io/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171030395.jpg">
+<meta property="og:image" content="http://lyallchan.github.io/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171030587.jpg">
+<meta property="og:image" content="http://lyallchan.github.io/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171030757.jpg">
+<meta property="og:image" content="http://lyallchan.github.io/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171030927.jpg">
 <meta property="article:published_time" content="2024-11-23T12:00:38.000Z">
-<meta property="article:modified_time" content="2024-11-24T09:00:05.231Z">
+<meta property="article:modified_time" content="2024-11-24T09:10:48.575Z">
 <meta property="article:author" content="lyallchan">
 <meta property="article:tag" content="Obsidian">
 <meta property="article:tag" content="IOS">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://lyallchan.github.io/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171029785.jpg">
 
 <link rel="canonical" href="http://lyallchan.github.io/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/">
 
@@ -188,7 +194,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-11-24 17:00:05" itemprop="dateModified" datetime="2024-11-24T17:00:05+08:00">2024-11-24</time>
+                <time title="修改时间：2024-11-24 17:10:48" itemprop="dateModified" datetime="2024-11-24T17:10:48+08:00">2024-11-24</time>
               </span>
 
           
@@ -202,28 +208,31 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="快捷指令抓取网页到Obsidian"><a href="#快捷指令抓取网页到Obsidian" class="headerlink" title="快捷指令抓取网页到Obsidian"></a>快捷指令抓取网页到Obsidian</h1><p>苹果手机共享到 [[Obsidian]]，只能抓取URL链接，不能抓取文章。看到<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/482022435?utm_psn=1842627038248321025">利用ios指令提升移动端obsidian使用体验</a>，可以使用[[快捷指令]]自动化抓取网页内容，就动手试了一下，其中的坑很多，文章里面也没有说清楚，这里做了记录。</p>
+        <h1 id="快捷指令抓取网页到Obsidian"><a href="#快捷指令抓取网页到Obsidian" class="headerlink" title="快捷指令抓取网页到Obsidian"></a>快捷指令抓取网页到Obsidian</h1><p>苹果手机共享到 <a href="Obsidian.md.md">Obsidian</a>，只能抓取URL链接，不能抓取文章。看到<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/482022435?utm_psn=1842627038248321025">利用ios指令提升移动端obsidian使用体验</a>，可以使用<a href="%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4">快捷指令</a>自动化抓取网页内容，就动手试了一下，其中的坑很多，文章里面也没有说清楚，这里做了记录。</p>
 <span id="more"></span>
 
-<h2 id="快捷指令设置"><a href="#快捷指令设置" class="headerlink" title="快捷指令设置"></a>快捷指令设置</h2><p>只需要安装 [[Obsidian]] [[Advanced URI]] 插件，不需要 [[Toolbox Pro]]。经过测试，长文本通过 [[Advanced URI]] 也可以很准确的写入 [[Obsidian]] 。</p>
+<h2 id="快捷指令设置"><a href="#快捷指令设置" class="headerlink" title="快捷指令设置"></a>快捷指令设置</h2><p>只需要安装 <a href="Obsidian.md.md">Obsidian</a> <a href="Advanced%20URI">Advanced URI</a> 插件，不需要 <a href="Toolbox%20Pro">Toolbox Pro</a>。经过测试，长文本通过 <a href="Advanced%20URI">Advanced URI</a> 也可以很准确的写入 <a href="Obsidian.md.md">Obsidian</a> 。</p>
 <p>日常文章来源<code>微信公众号</code>、<code>网易新闻</code>和<code>知乎</code>，有时还会直接用<code>浏览器</code>看网页，测试的时候主要是这4个场景。</p>
-<h3 id="输入快捷指令"><a href="#输入快捷指令" class="headerlink" title="输入快捷指令"></a>输入快捷指令</h3><p>![[IMG-20241124164033089.jpg|480]]</p>
+<h3 id="输入快捷指令"><a href="#输入快捷指令" class="headerlink" title="输入快捷指令"></a>输入快捷指令</h3><img src="/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171029785.jpg" class="" alt="480">
+
 <p>从共享表单输入，或者读取剪贴板URL。两个输入方式分别对应不同的操作方法</p>
 <ol>
 <li>从共享表单输入。网易新闻 <code>共享-系统</code>，浏览器 <code>共享</code>，拉到最后找到这个快捷指令，就能读取相应的信息。微信公众号的 <code>共享-系统</code> 实际不是调用系统共享只有常用的公众号，不使用这个场景。</li>
 <li>获取剪贴板。将当前页面的URL拷贝到剪贴板，网易新闻和微信公众号共享中都有复制链接功能。</li>
 <li>知乎比较特殊，对于文章保护措施比较多，拉取文章经常会失败。知乎共享中有系统功能，也能找到这个快捷方式，但是拉取文章失败，共享中也可以复制链接，也拉取文章失败。</li>
 </ol>
-<h3 id="处理加工"><a href="#处理加工" class="headerlink" title="处理加工"></a>处理加工</h3><p>![[IMG-20241124164033315.jpg|480]]</p>
+<h3 id="处理加工"><a href="#处理加工" class="headerlink" title="处理加工"></a>处理加工</h3><img src="/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171030395.jpg" class="" alt="480">
+
 <p>处理4步：</p>
 <ol>
 <li>从快捷指令中获取URL。</li>
 <li>通过URL拉取文章。这是通过URL重新拉取网页。</li>
 <li>拉取的网页markdown化。经过实测，可以保留图片链接，黑体字等，但是有些标题识别不出来，总体还能接受。</li>
-<li>拼接 [[Obsidian]] 模板。主要有fromtmatter，包括日期，文章原始链接、作者等，这三个字段都可以从拉取的网页信息中得到，其中日期可以自定义格式，我定义的格式为 <code>yyyy-MM-dd HH:mm:ss</code>， 还有别名、tag等，再后面是文章的1号标题，使用网页标题，正文是markdown化后的内容，尾部做了个tag</li>
+<li>拼接 <a href="Obsidian.md.md">Obsidian</a> 模板。主要有fromtmatter，包括日期，文章原始链接、作者等，这三个字段都可以从拉取的网页信息中得到，其中日期可以自定义格式，我定义的格式为 <code>yyyy-MM-dd HH:mm:ss</code>， 还有别名、tag等，再后面是文章的1号标题，使用网页标题，正文是markdown化后的内容，尾部做了个tag</li>
 </ol>
-<p>处理过程很清晰，第2步拉取知乎网页会失败，第三步文章markdown化更加符合 [[Obsidian]] 的风格</p>
-<h3 id="写入Obsidian"><a href="#写入Obsidian" class="headerlink" title="写入Obsidian"></a>写入Obsidian</h3><p>![[IMG-20241124164033643.jpg|480]]</p>
+<p>处理过程很清晰，第2步拉取知乎网页会失败，第三步文章markdown化更加符合 <a href="Obsidian.md.md">Obsidian</a> 的风格</p>
+<h3 id="写入Obsidian"><a href="#写入Obsidian" class="headerlink" title="写入Obsidian"></a>写入Obsidian</h3><img src="/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171030587.jpg" class="" alt="480">
+
 <p>输出到Obsidian分3步</p>
 <ol>
 <li>将前面的文章模板URL编码。这个步骤很重要，可能因为模板里面有 <code>#</code>，没有这一步，输出Obsidian失败</li>
@@ -234,8 +243,12 @@
 </li>
 <li>打开这个URL。就可以将文章写入Obsidian</li>
 </ol>
-<h3 id="部署快捷指令"><a href="#部署快捷指令" class="headerlink" title="部署快捷指令"></a>部署快捷指令</h3><p>将快捷指令命名为 <code>OB通过URL拉取内容</code>，选择 <code>在共享表单中显示</code>，<br>![[IMG-20241124164033839.jpg|480]]</p>
-<p>将这个快捷指令也放在手机的 <code>设置-辅助功能-辅助触控</code> 小圆点中，方便调用<br>![[IMG-20241124164034071.jpg|480]]</p>
+<h3 id="部署快捷指令"><a href="#部署快捷指令" class="headerlink" title="部署快捷指令"></a>部署快捷指令</h3><p>将快捷指令命名为 <code>OB通过URL拉取内容</code>，选择 <code>在共享表单中显示</code>，</p>
+<img src="/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171030757.jpg" class="" alt="480">
+
+<p>将这个快捷指令也放在手机的 <code>设置-辅助功能-辅助触控</code> 小圆点中，方便调用</p>
+<img src="/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/IMG-20241124171030927.jpg" class="" alt="480">
+
 <h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="微信公众号"><a href="#微信公众号" class="headerlink" title="微信公众号"></a>微信公众号</h3><p>这个方法对微信公众号适配的最好，基本能原样抓取，2步</p>
 <ol>
 <li>微信公众号文章 - 共享 - 复制链接</li>
