@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="使用豆包做了一个Obsidian插件使用豆包做了一个Obsidian插件，实现根据核心插件 文件列表 的排序方式，打开目录中前一个文件，后一个文件功能。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用豆包做了一个Obsidian插件">
+<meta property="og:url" content="http://lyallchan.github.io/2024/12/13/%E4%BD%BF%E7%94%A8%E8%B1%86%E5%8C%85%E5%81%9A%E4%BA%86%E4%B8%80%E4%B8%AAObsidian%E6%8F%92%E4%BB%B6/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="使用豆包做了一个Obsidian插件使用豆包做了一个Obsidian插件，实现根据核心插件 文件列表 的排序方式，打开目录中前一个文件，后一个文件功能。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-12-13T15:08:49.000Z">
+<meta property="article:modified_time" content="2024-12-13T15:58:33.491Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="Obsidian">
+<meta property="article:tag" content="豆包">
+<meta property="article:tag" content="插件">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2024/12/13/%E4%BD%BF%E7%94%A8%E8%B1%86%E5%8C%85%E5%81%9A%E4%BA%86%E4%B8%80%E4%B8%AAObsidian%E6%8F%92%E4%BB%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用豆包做了一个Obsidian插件 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2024/12/13/%E4%BD%BF%E7%94%A8%E8%B1%86%E5%8C%85%E5%81%9A%E4%BA%86%E4%B8%80%E4%B8%AAObsidian%E6%8F%92%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用豆包做了一个Obsidian插件
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-12-13 23:08:49 / 修改时间：23:58:33" itemprop="dateCreated datePublished" datetime="2024-12-13T23:08:49+08:00">2024-12-13</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="使用豆包做了一个Obsidian插件"><a href="#使用豆包做了一个Obsidian插件" class="headerlink" title="使用豆包做了一个Obsidian插件"></a>使用豆包做了一个Obsidian插件</h1><p>使用豆包做了一个Obsidian插件，实现根据核心插件 <code>文件列表</code> 的排序方式，打开目录中前一个文件，后一个文件功能。</p>
+<span id="more"></span>
+
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Obsidian自带了前一个日记和后一个日记功能，但是没有在任意目录打开前一个/后一个文件功能，插件 <code>File Tree Alternative</code> 可以实现类似功能，但只能根据文件名排序，不够直观。初步的想法是根据核心插件 <code>文件列表</code> 排序方式，打开前一个/后一个文件的功能。</p>
+<p>没有做过Obsidian插件，懂一点JS。</p>
+<p>最终依靠豆包，两个晚上完成了功能，运行良好。</p>
+<h1 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h1><ol>
+<li> [[docs.obsidian.md]] 查看文档，并根据文档 <code>git clone</code> 插件样例，按照文档安装需要的包</li>
+<li><code>npm run</code> 生成 <code>main.js</code>，再根据文档编辑生成 <code>manifest.json</code></li>
+<li>在Obsidian插件目录中，新建文件夹 <code>obsidian-previous-next-file</code> 做为插件目录， 将 <code>main.js</code> 和 <code>manifest.json</code> 符号链接到这个目录下，完成了插件安装</li>
+<li>运行 <code>npm run dev</code>，调试修改代码，可以实时反映到 <code>main.js</code> 中，<code>Obsidian</code> 关闭启动插件一次，就能使修改后的代码生效</li>
+</ol>
+<p>manifest.json的具体内容</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;prev-next-file-plugin&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Previous &amp; Next File Plugin&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;author&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Your Name&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;0.0.3&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;minAppVersion&quot;</span><span class="punctuation">:</span> <span class="string">&quot;0.9.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;A plugin to open the previous or next file based on the order of Markdown files in the current file&#x27;s folder (ordered by file name in descending order).&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;permissions&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;isDesktopOnly&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="和豆包交互"><a href="#和豆包交互" class="headerlink" title="和豆包交互"></a>和豆包交互</h1><p>豆包不知道的2个功能点，自己搜索到的，再告诉豆包。</p>
+<h2 id="1-如何找到核心插件文件列表的排序方式"><a href="#1-如何找到核心插件文件列表的排序方式" class="headerlink" title="1. 如何找到核心插件文件列表的排序方式"></a>1. 如何找到核心插件<code>文件列表</code>的排序方式</h2><ol>
+<li><a target="_blank" rel="noopener" href="https://forum.obsidian.md/t/file-explorer-api/73329">File explorer API</a>，受到这个帖子启发，在 <code>dev tools</code> 里面查看</li>
+<li><code>app.workspace.getLeavesOfType(&#39;file-explorer&#39;)[0].view</code> 返回一个对象，其中 <code>.sortOrder</code> 是排序方式，经过测试，一共6种排序方法</li>
+</ol>
+<h2 id="2-npm-run-build-报错，而-npm-run-dev-能通过"><a href="#2-npm-run-build-报错，而-npm-run-dev-能通过" class="headerlink" title="2. npm run build 报错，而 npm run dev 能通过"></a>2. <code>npm run build</code> 报错，而 <code>npm run dev</code> 能通过</h2><pre><code>改了两个配置文件，
+1. 在 `package.json` 中去掉了 `tsc -noEmit -skipLibCheck `
+2. 在 `tsconfig.json` 中增加了 `noImplicitAny: false` 和 `skipLibCheck: true`
+</code></pre>
+<h2 id="3-和豆包的整个交互过程"><a href="#3-和豆包的整个交互过程" class="headerlink" title="3. 和豆包的整个交互过程"></a>3. 和豆包的整个交互过程</h2><p>一共43步，包括了所有对话，下面清单都是我对豆包讲的话，豆包的回复主要都是代码，就省略了。<code>#</code> 后面是补充的情况说明，不是对话的内容。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1.</span> 生成一个obsidian插件，可以按照核心插件·文件列表·的文件顺序，打开前一个文件</span><br><span class="line"><span class="number">2.</span> main.ts:<span class="number">10</span>:<span class="number">22</span> - error TS2339: Property <span class="string">&#x27;openPreviousFile&#x27;</span> does <span class="keyword">not</span> exist on <span class="built_in">type</span> <span class="string">&#x27;PrevFilePlugin&#x27;</span>. <span class="comment"># 第一次生成报错，报错信息给豆包，豆包修改代码</span></span><br><span class="line"><span class="number">3.</span> 读取当前文件所在文件夹的所有markdown文件，按照文件名降序排列 <span class="comment"># 豆包不知道怎么读取文件列表的文件顺序，退而求其次，先实现前一个/后一个文件功能</span></span><br><span class="line"><span class="number">4.</span> 再增加一个打开后一个文件的命令 <span class="comment"># 实现了前一个文件，再增加后一个文件命令</span></span><br><span class="line"><span class="number">5.</span> 修改manifest.json相应的说明 <span class="comment"># 说明中也增加后一个文件命令</span></span><br><span class="line"><span class="number">6.</span> 在移动app上也可以使用 <span class="comment"># 也是修改manifest.json文件</span></span><br><span class="line"><span class="number">7.</span> main.ts:<span class="number">2</span>:<span class="number">8</span> - error TS1259: Module <span class="string">&#x27;&quot;path&quot;&#x27;</span> can only be default-imported using the <span class="string">&#x27;allowSyntheticDefaultImports&#x27;</span> flag <span class="comment"># 报错</span></span><br><span class="line"><span class="number">8.</span> getOrderedFileList()，一直返回空数组，逻辑错误的 <span class="comment"># 又一个报错，这个错误比较奇怪</span></span><br><span class="line"><span class="number">9.</span> 还是找不到当前目录的文件，函数一直返回空数组 <span class="comment"># 报错</span></span><br><span class="line"><span class="number">10.</span> 有没有办法使用obsidian提供的函数返回当前文件所在文件夹的文件列表 <span class="comment"># 报错解决不掉，询问豆包有没有其它办法</span></span><br><span class="line"><span class="number">11.</span> TypeError: Right-hand side of <span class="string">&#x27;instanceof&#x27;</span> <span class="keyword">is</span> <span class="keyword">not</span> an <span class="built_in">object</span> <span class="comment"># 继续报错</span></span><br><span class="line"><span class="number">12.</span> 还是出现上面的错误 <span class="comment"># 继续报错</span></span><br><span class="line"><span class="number">13.</span> 找到原因了，child.extension === <span class="string">&#x27;.md&#x27;</span>，应该是child.extension === <span class="string">&#x27;md&#x27;</span> <span class="comment"># 自己调试，找到原因了，错误很低级</span></span><br><span class="line"><span class="number">14.</span> 如果正序排序，代码是怎么样的 <span class="comment"># 优化</span></span><br><span class="line"><span class="number">15.</span> 按照核心插件，文件列表的排序方式排序 <span class="comment"># 不忘初心，还是想读取文件列表的排序方式</span></span><br><span class="line"><span class="number">16.</span> 怎样取得核心插件文件列表的排序方式 <span class="comment"># 不忘初心</span></span><br><span class="line"><span class="number">17.</span> 怎么读取第三方插件“File Tree Alternative”的排序方式 <span class="comment"># 豆包实在不会，尝试读取第三方插件的排序方式</span></span><br><span class="line"><span class="number">18.</span> 怎么读取第三方插件File Tree Alternative配置文件data.json的数据 <span class="comment"># 豆包也不会，引导豆包直接读配置文件</span></span><br><span class="line"><span class="number">19.</span> File Tree Alternative的排序字段在配置data.json中的sortFilesBy和sortReverse两个字段，根据这两个字段排序 <span class="comment"># 继续引导，这次完成的很好</span></span><br><span class="line"><span class="number">20.</span> 完善一下getPluginConfig方法 </span><br><span class="line"><span class="number">21.</span> File Tree Alternative，实际路径为file-tree-alternative，根据实际路径修改代码，并给出完整的main.ts代码</span><br><span class="line"><span class="number">22.</span> file-tree-alternative还收一个排序方法file-size，根据文件大小排序，请补充代码 <span class="comment"># 补充完整排序字典</span></span><br><span class="line"><span class="number">23.</span> file-tree-alternative的文件排序有四种方法，分别是name，created，last-update和file-size，分别对应文件名，创建时间，修改时间和文件大小，根据这四种方法修改代码 <span class="comment"># 补充完整排序字典</span></span><br><span class="line"><span class="number">24.</span> const pluginDataPath = path.join(this.app.vault.configDir, <span class="string">&#x27;plugins&#x27;</span>, <span class="string">&#x27;file-tree-alternative&#x27;</span>, <span class="string">&#x27;data.json&#x27;</span>);得到的配置文件路径错误 <span class="comment"># 路径错误</span></span><br><span class="line"><span class="number">25.</span> const pluginDataPath = path.join(this.app.vault.configDir, <span class="string">&#x27;plugins&#x27;</span>, <span class="string">&#x27;file-tree-alternative&#x27;</span>, <span class="string">&#x27;data.json&#x27;</span>);得到了obsidian安装目录，而不是vault所在的目录</span><br><span class="line"><span class="number">26.</span> 应该是const pluginDataPath = path.join(this.app.vault.adapter.basePath, this.app.vault.configDir, <span class="string">&#x27;plugins&#x27;</span>, <span class="string">&#x27;file-tree-alternative&#x27;</span>, <span class="string">&#x27;data.json&#x27;</span>); <span class="comment"># 告诉豆包正确的方法</span></span><br><span class="line"><span class="number">27.</span> this.app.vault.configDir只返回.obsidian，</span><br><span class="line"><span class="number">28.</span> this.app.vault.configDir只返回.obsidian，而不是完整的路径 <span class="comment"># 豆包不认错，和豆包讲道理</span></span><br><span class="line"><span class="number">29.</span> TypeError: aModifyTime.getTime <span class="keyword">is</span> <span class="keyword">not</span> a function <span class="comment"># 报错</span></span><br><span class="line"><span class="number">30.</span> a.stat.mtime <span class="built_in">type</span>: number <span class="comment"># 报错</span></span><br><span class="line"><span class="number">31.</span> 考虑兼容性问题，修改代码</span><br><span class="line"><span class="number">32.</span> <span class="keyword">import</span> path <span class="keyword">from</span> <span class="string">&#x27;path&#x27;</span> 应该是<span class="keyword">import</span> * <span class="keyword">as</span> path <span class="keyword">from</span> <span class="string">&#x27;path&#x27;</span> <span class="comment"># 正确引导包</span></span><br><span class="line"><span class="number">33.</span> Cannot assign to <span class="string">&quot;aCreationTime&quot;</span> because it <span class="keyword">is</span> a constant <span class="comment"># 报错</span></span><br><span class="line"><span class="number">34.</span> 去掉currentFolder instanceof this.app.vault.Folder的判断 <span class="comment"># 报错解决不掉，相应代码意义不大，直接删掉</span></span><br><span class="line"><span class="number">35.</span> line97，  Expected <span class="string">&quot;&#125;&quot;</span> but found <span class="string">&quot;;&quot;</span> <span class="comment"># 低级错误</span></span><br><span class="line"><span class="number">36.</span> 有好几处类似的错误，将, 误写成 ; 找到所有错误，并修改代码 <span class="comment"># 低级错误，应该是步骤太多了，豆包处理不过来</span></span><br><span class="line"><span class="number">37.</span> 读取配置文件还是失败了，增加base代码 <span class="comment"># 还是路径问题，第26步已经正确了，现在又错了</span></span><br><span class="line"><span class="number">38.</span> 修改成 const pluginDataPath = path.join(this.app.vault.adapter.basePath, this.app.vault.configDir, <span class="string">&#x27;plugins&#x27;</span>, <span class="string">&#x27;file-tree-alternative&#x27;</span>, <span class="string">&#x27;data.json&#x27;</span>)， 测试下来能返回正确的配置文件 <span class="comment"># 和豆包讲道理，这次豆包听进去了</span></span><br><span class="line"><span class="number">39.</span> error TS2339: Property <span class="string">&#x27;basePath&#x27;</span> does <span class="keyword">not</span> exist on <span class="built_in">type</span> <span class="string">&#x27;DataAdapter&#x27;</span>. <span class="comment"># 低级错误</span></span><br><span class="line"><span class="number">40.</span> 使用npm run dev能通过，使用npm run build就报上面的错误 <span class="comment"># 新情况，问问豆包怎么办，豆包没答出来，自己找资料，也是一个初级问题</span></span><br><span class="line"><span class="number">41.</span> error TS7006: Parameter <span class="string">&#x27;child&#x27;</span> implicitly has an <span class="string">&#x27;any&#x27;</span> <span class="built_in">type</span>. <span class="comment"># 低级错误，修改以后，整套代码可以正常运行，实现了读取第三方插件排序方式，打开前一个/后一个文件功能</span></span><br><span class="line"><span class="number">42.</span> 根据这个命令app.workspace.getLeavesOfType(<span class="string">&#x27;file-explorer&#x27;</span>)[<span class="number">0</span>].view.sortOrder确定排序方式 <span class="comment"># 自己找到了怎么读取文件列表插件的排序方式</span></span><br><span class="line"><span class="number">43.</span> 返回<span class="number">6</span>种排序方式，alphabetical,alphabeticalReverse,byModifiedTime,byModifiedTimeReverse,byCreatedTime,byCreatedTimeReverse，分别应对文件名,文件名倒序,编辑时间,编辑时间倒序,创建时间,创建时间倒序，按照这个逻辑修改代码 <span class="comment"># 告诉豆包实现方法，豆包之后给出了正确代码，一次运行成功</span></span><br></pre></td></tr></table></figure>
+<hr>
+<p>#日期/2024-12-13</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Obsidian/" rel="tag"># Obsidian</a>
+              <a href="/tags/%E8%B1%86%E5%8C%85/" rel="tag"># 豆包</a>
+              <a href="/tags/%E6%8F%92%E4%BB%B6/" rel="tag"># 插件</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/11/23/%E5%BF%AB%E6%8D%B7%E6%8C%87%E4%BB%A4%E6%8A%93%E5%8F%96%E7%BD%91%E9%A1%B5%E5%88%B0Obsidian/" rel="prev" title="快捷指令抓取网页到Obsidian">
+      <i class="fa fa-chevron-left"></i> 快捷指令抓取网页到Obsidian
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%B1%86%E5%8C%85%E5%81%9A%E4%BA%86%E4%B8%80%E4%B8%AAObsidian%E6%8F%92%E4%BB%B6"><span class="nav-number">1.</span> <span class="nav-text">使用豆包做了一个Obsidian插件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">2.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83"><span class="nav-number">3.</span> <span class="nav-text">搭建环境</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%92%8C%E8%B1%86%E5%8C%85%E4%BA%A4%E4%BA%92"><span class="nav-number">4.</span> <span class="nav-text">和豆包交互</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%A6%82%E4%BD%95%E6%89%BE%E5%88%B0%E6%A0%B8%E5%BF%83%E6%8F%92%E4%BB%B6%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8%E7%9A%84%E6%8E%92%E5%BA%8F%E6%96%B9%E5%BC%8F"><span class="nav-number">4.1.</span> <span class="nav-text">1. 如何找到核心插件文件列表的排序方式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-npm-run-build-%E6%8A%A5%E9%94%99%EF%BC%8C%E8%80%8C-npm-run-dev-%E8%83%BD%E9%80%9A%E8%BF%87"><span class="nav-number">4.2.</span> <span class="nav-text">2. npm run build 报错，而 npm run dev 能通过</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%92%8C%E8%B1%86%E5%8C%85%E7%9A%84%E6%95%B4%E4%B8%AA%E4%BA%A4%E4%BA%92%E8%BF%87%E7%A8%8B"><span class="nav-number">4.3.</span> <span class="nav-text">3. 和豆包的整个交互过程</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">126</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
