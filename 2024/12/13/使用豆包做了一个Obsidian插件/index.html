@@ -28,7 +28,7 @@
 <meta property="og:description" content="使用豆包做了一个Obsidian插件使用豆包做了一个Obsidian插件，实现根据核心插件 文件列表 的排序方式，打开目录中前一个文件，后一个文件功能。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-12-13T15:08:49.000Z">
-<meta property="article:modified_time" content="2024-12-13T15:58:33.491Z">
+<meta property="article:modified_time" content="2024-12-13T16:17:10.885Z">
 <meta property="article:author" content="lyallchan">
 <meta property="article:tag" content="Obsidian">
 <meta property="article:tag" content="豆包">
@@ -181,10 +181,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2024-12-13 23:08:49 / 修改时间：23:58:33" itemprop="dateCreated datePublished" datetime="2024-12-13T23:08:49+08:00">2024-12-13</time>
+              <time title="创建时间：2024-12-13 23:08:49" itemprop="dateCreated datePublished" datetime="2024-12-13T23:08:49+08:00">2024-12-13</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-12-14 00:17:10" itemprop="dateModified" datetime="2024-12-14T00:17:10+08:00">2024-12-14</time>
+              </span>
 
           
 
@@ -200,19 +206,19 @@
         <h1 id="使用豆包做了一个Obsidian插件"><a href="#使用豆包做了一个Obsidian插件" class="headerlink" title="使用豆包做了一个Obsidian插件"></a>使用豆包做了一个Obsidian插件</h1><p>使用豆包做了一个Obsidian插件，实现根据核心插件 <code>文件列表</code> 的排序方式，打开目录中前一个文件，后一个文件功能。</p>
 <span id="more"></span>
 
-<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Obsidian自带了前一个日记和后一个日记功能，但是没有在任意目录打开前一个/后一个文件功能，插件 <code>File Tree Alternative</code> 可以实现类似功能，但只能根据文件名排序，不够直观。初步的想法是根据核心插件 <code>文件列表</code> 排序方式，打开前一个/后一个文件的功能。</p>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>Obsidian自带了前一个日记和后一个日记功能，但是没有在任意目录打开前一个/后一个文件功能，插件 <code>File Tree Alternative</code> 可以实现类似功能，但只能根据文件名排序，不够直观。初步的想法是实现一个根据核心插件 <code>文件列表</code> 排序方式，打开前一个/后一个文件的插件。</p>
 <p>没有做过Obsidian插件，懂一点JS。</p>
-<p>最终依靠豆包，两个晚上完成了功能，运行良好。</p>
+<p>最终依靠豆包，一行代码和注释也没有写，两个晚上完成了功能，运行良好。</p>
 <h1 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h1><ol>
-<li> [[docs.obsidian.md]] 查看文档，并根据文档 <code>git clone</code> 插件样例，按照文档安装需要的包</li>
+<li> <a href="docs.obsidian.md">docs.obsidian.md</a> 查看文档，并根据文档 <code>git clone</code> 插件样例，按照文档安装需要的包</li>
 <li><code>npm run</code> 生成 <code>main.js</code>，再根据文档编辑生成 <code>manifest.json</code></li>
 <li>在Obsidian插件目录中，新建文件夹 <code>obsidian-previous-next-file</code> 做为插件目录， 将 <code>main.js</code> 和 <code>manifest.json</code> 符号链接到这个目录下，完成了插件安装</li>
-<li>运行 <code>npm run dev</code>，调试修改代码，可以实时反映到 <code>main.js</code> 中，<code>Obsidian</code> 关闭启动插件一次，就能使修改后的代码生效</li>
+<li>运行 <code>npm run dev</code>，调试修改代码，可以实时反映到 <code>main.js</code> 中，<code>Obsidian</code> 中关闭启动插件一次，就能使修改后的代码生效</li>
 </ol>
 <p>manifest.json的具体内容</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;prev-next-file-plugin&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;name&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Previous &amp; Next File Plugin&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;author&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Your Name&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;version&quot;</span><span class="punctuation">:</span> <span class="string">&quot;0.0.3&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;minAppVersion&quot;</span><span class="punctuation">:</span> <span class="string">&quot;0.9.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;description&quot;</span><span class="punctuation">:</span> <span class="string">&quot;A plugin to open the previous or next file based on the order of Markdown files in the current file&#x27;s folder (ordered by file name in descending order).&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;permissions&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span><span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;isDesktopOnly&quot;</span><span class="punctuation">:</span> <span class="literal"><span class="keyword">false</span></span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
 
-<h1 id="和豆包交互"><a href="#和豆包交互" class="headerlink" title="和豆包交互"></a>和豆包交互</h1><p>豆包不知道的2个功能点，自己搜索到的，再告诉豆包。</p>
+<h1 id="和豆包交互"><a href="#和豆包交互" class="headerlink" title="和豆包交互"></a>和豆包交互</h1><p>整个过程中，有2个点豆包不知道，人肉搜索到解决方案，再告诉豆包修改到代码中，如果要小修改代码，直接告诉豆包，让豆包帮你修改。</p>
 <h2 id="1-如何找到核心插件文件列表的排序方式"><a href="#1-如何找到核心插件文件列表的排序方式" class="headerlink" title="1. 如何找到核心插件文件列表的排序方式"></a>1. 如何找到核心插件<code>文件列表</code>的排序方式</h2><ol>
 <li><a target="_blank" rel="noopener" href="https://forum.obsidian.md/t/file-explorer-api/73329">File explorer API</a>，受到这个帖子启发，在 <code>dev tools</code> 里面查看</li>
 <li><code>app.workspace.getLeavesOfType(&#39;file-explorer&#39;)[0].view</code> 返回一个对象，其中 <code>.sortOrder</code> 是排序方式，经过测试，一共6种排序方法</li>
