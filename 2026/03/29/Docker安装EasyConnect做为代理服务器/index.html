@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
+  </script>
+
+  <meta name="description" content="Docker安装EasyConnect做为代理服务器名在WSL中安装Docker版本的EasyConnect，VPN拨入内网，做为宿主机的代理服务器，实现宿主机同时访问内网和外网，同时使用内网云桌面和外网云桌面。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="未命名">
+<meta property="og:url" content="http://lyallchan.github.io/2026/03/29/Docker%E5%AE%89%E8%A3%85EasyConnect%E5%81%9A%E4%B8%BA%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1%E5%99%A8/index.html">
+<meta property="og:site_name" content="折腾手记">
+<meta property="og:description" content="Docker安装EasyConnect做为代理服务器名在WSL中安装Docker版本的EasyConnect，VPN拨入内网，做为宿主机的代理服务器，实现宿主机同时访问内网和外网，同时使用内网云桌面和外网云桌面。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-29T12:25:38.000Z">
+<meta property="article:modified_time" content="2026-04-07T13:42:25.577Z">
+<meta property="article:author" content="lyallchan">
+<meta property="article:tag" content="EasyConnect、Docker、沙箱、WSL2">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://lyallchan.github.io/2026/03/29/Docker%E5%AE%89%E8%A3%85EasyConnect%E5%81%9A%E4%B8%BA%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>未命名 | 折腾手记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">折腾手记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">运维！！运维！！</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-fa fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-fa fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-fa fa-tags"></i>标签</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2026/03/29/Docker%E5%AE%89%E8%A3%85EasyConnect%E5%81%9A%E4%B8%BA%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lyallchan">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="折腾手记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          未命名
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2026-03-29 20:25:38" itemprop="dateCreated datePublished" datetime="2026-03-29T20:25:38+08:00">2026-03-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2026-04-07 21:42:25" itemprop="dateModified" datetime="2026-04-07T21:42:25+08:00">2026-04-07</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Docker安装EasyConnect做为代理服务器名"><a href="#Docker安装EasyConnect做为代理服务器名" class="headerlink" title="Docker安装EasyConnect做为代理服务器名"></a>Docker安装EasyConnect做为代理服务器名</h1><p>在WSL中安装Docker版本的EasyConnect，VPN拨入内网，做为宿主机的代理服务器，实现宿主机同时访问内网和外网，同时使用内网云桌面和外网云桌面。</p>
+<span id="more"></span>
+
+<h2 id="WSL中安装Docker版本的EasyConnect"><a href="#WSL中安装Docker版本的EasyConnect" class="headerlink" title="WSL中安装Docker版本的EasyConnect"></a>WSL中安装Docker版本的EasyConnect</h2><p><a target="_blank" rel="noopener" href="https://github.com/docker-easyconnect/docker-easyconnect">使用的项目是docker-easyconnect项目</a></p>
+<h3 id="WSL配置"><a href="#WSL配置" class="headerlink" title="WSL配置"></a>WSL配置</h3><p>Win11启动WSL2，正常安装Ubuntu，在Ubuntu中安装Docker。不用安装Win11的Docker Desktop，全部在WSL运行使用Docker。</p>
+<p>Docker换源</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="built_in">mkdir</span> -p /etc/docker</span><br><span class="line">sudo <span class="built_in">tee</span> /etc/docker/daemon.json &lt;&lt;-<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;registry-mirrors&quot;</span>: [</span><br><span class="line">        <span class="string">&quot;https://docker.1ms.run&quot;</span>,</span><br><span class="line">        <span class="string">&quot;https://docker.m.ixdev.cn&quot;</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line">sudo systemctl restart docker</span><br></pre></td></tr></table></figure>
+
+<p>在Win11中打开程序 <code>WSL Settings</code>，这是新出的WSL配置GUI界面，不用苦哈哈的编辑配置文件，找配置命令。网络选择 <code>NAT</code> 模式。</p>
+<blockquote>
+<p>其实应该选择 <code>Mirrored</code> 模式，但是我的WSL如果启用了 <code>Mirrored</code> 模式，WSL获取不到IP地址，选择NAT模式也能运行。</p>
+</blockquote>
+<h3 id="启动EasyConnect脚本"><a href="#启动EasyConnect脚本" class="headerlink" title="启动EasyConnect脚本"></a>启动EasyConnect脚本</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">#!/bin/bash</span></span><br><span class="line"><span class="comment"># 启动EasyConnect脚本</span></span><br><span class="line"><span class="comment"># c:\Users\XXX\bin\wsl\start-vpn.sh 或者</span></span><br><span class="line"><span class="comment"># /mnt/c/Users/XXX/bin/wsl/start-vpn.sh</span></span><br><span class="line"></span><br><span class="line">NAME=<span class="string">&quot;vpn&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> docker inspect <span class="string">&quot;<span class="variable">$&#123;NAME&#125;</span>&quot;</span> &gt;/dev/null 2&gt;&amp;1; <span class="keyword">then</span></span><br><span class="line"></span><br><span class="line">	<span class="built_in">echo</span> vpn docker already started</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line"></span><br><span class="line">	docker run \</span><br><span class="line">		--name vpn \</span><br><span class="line">        --<span class="built_in">rm</span> \</span><br><span class="line">		--mac-address=02:42:ac:11:00:02 \</span><br><span class="line">		-h=desktop-667 \</span><br><span class="line">		--device /dev/net/tun\</span><br><span class="line">		--cap-add NET_ADMIN \</span><br><span class="line">		-p 1080:1080 \</span><br><span class="line">        -p 8888:8888 \</span><br><span class="line">		-v /etc/EasyConnect:/root \</span><br><span class="line">		-v /tmp/.X11-unix:/tmp/.X11-unix \</span><br><span class="line">		-e EC_VER=7.6.7 \</span><br><span class="line">		-e DISPLAY=<span class="variable">$DISPLAY</span> \</span><br><span class="line">		-e EXIT=1 \</span><br><span class="line">		-e TYPE=X11 \</span><br><span class="line">		hagb/docker-easyconnect:vncless-7.6.7</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>说明：</p>
+<ol>
+<li>VPN是容器名字，便于管理。</li>
+<li>判断容器是否运行，如果已经运行，给出提示，如果没有运行，则启动VPN镜像。</li>
+<li><code>--mac-address</code>、<code>-h</code>：固定容器的MAC地址和镜像的主机名。EasyConnect拨号的时候，绑定了MAC地址和Host主机名，而且绑定有数量限制。Docker镜像启动的时候，会随机指定MAC地址和主机名。因此在启动脚本中，需要固定容器MAC地址和主机名。</li>
+<li><code>--device</code>、<code>--cap-add</code>：启动容器的虚拟网卡。</li>
+<li>开放1080和8888端口。其中1080是 <code>Sock5</code> 代理端口，8888是 <code>HTTPS</code> 代理端口。</li>
+<li><code>-v  /etc/EasyConnect:/root </code> 是EasyConnect配置文件目录。</li>
+<li><code>-v /tmp/.X11-unix:/tmp/.X11-unix</code>、<code>-e DISPLAY=$DISPLAY </code> 、<code>-e TYPE=X11 </code> 三个配置开放WSLg，可以运行WSL中的GUI应用，最终的效果就是在Win11中显示 <code>EasConnect GUI</code> 界面，好像原生的Win11应用一样。在<a target="_blank" rel="noopener" href="https://learn.microsoft.com/zh-cn/windows/wsl/tutorials/gui-apps">使用 WSL 运行 Linux GUI 应用 | Microsoft Learn</a> 有详细的描述。</li>
+<li><code>-e EXIT=1</code> 退出 <code>EasyConnect</code> 就退出容器，如果没有这句话，退出 <code>EasyConnect</code> 默认重新拨号连接。</li>
+<li><code>hagb/docker-easyconnect:vncless-7.6.7</code>，镜像名字</li>
+<li>特别说明：不要加 <code>-d</code> ，不以 <code>daemon</code> 方式启动容器，保持在前台运行。WSL默认有个设置，程序完成后或者退回后台后，会退出WSL。退出WSL，容器停止，VPN中断。保持程序前台运行可以防止退出WSL。容器停止后状态为 <code>DEAD</code>，使用普通方法删除不了，特意写了个删除脚本，sudo运行。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment"># docker.clean.sh</span></span><br><span class="line"><span class="comment"># 删除脚本，不同于上面的启动脚本</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">chmod</span> 777 /var/lib/docker/</span><br><span class="line"><span class="built_in">chmod</span> 777 /var/lib/docker/containers/</span><br><span class="line"><span class="built_in">rm</span> -rf /var/lib/docker/containers/</span><br><span class="line">systemctl restart docker.service</span><br></pre></td></tr></table></figure>
+
+<p>将<strong>启动脚本</strong>放在了Win11中，可以随时编辑修改。具体路径 <code>c:\Users\XXX\bin\wsl\start-vpn.sh</code> ，再在WSL中 <code>chmod 777 /mnt/c/Users/XXX/bin/wsl/start-vpn.sh</code> 变成可执行脚本。</p>
+<h3 id="配置镜像可在Win11中直接启动"><a href="#配置镜像可在Win11中直接启动" class="headerlink" title="配置镜像可在Win11中直接启动"></a>配置镜像可在Win11中直接启动</h3><p>配置上面生成的启动脚本 <code>start-vpn.sh</code> 可以在Win11开始菜单直接启动。</p>
+<p>配置文件在WSL目录 <code>/usr/share/applications/*.desktop</code>，每个desktop对应了一个开始菜单 <code>Ubuntu</code> 文件夹下的快捷方式。</p>
+<p>新建文件 <code>/usr/share/applications/easyconnect.desktop</code> 。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[Desktop Entry]</span><br><span class="line">Name=启动EasyConnect</span><br><span class="line">Comment=EasyConnect Docker</span><br><span class="line">Exec=/bin/bash -c <span class="string">&quot;/mnt/c/Users/XXX/bin/wsl/start-vpn.sh&quot;</span></span><br><span class="line">Icon=/mnt/c/Users/XXX/bin/wsl/easyconnect.png</span><br><span class="line">Terminal=<span class="literal">false</span></span><br><span class="line">Type=Application</span><br></pre></td></tr></table></figure>
+
+<p>说明：</p>
+<ol>
+<li>Name是在Win11开始菜单看到的名字</li>
+<li>Exec是启动脚本路径</li>
+<li>Icon是图标，支持PNG和ICO文件，这里用的是EasyConnect的原始图标</li>
+</ol>
+<h3 id="启动EasyConnect"><a href="#启动EasyConnect" class="headerlink" title="启动EasyConnect"></a>启动EasyConnect</h3><p>在Win11中启动脚本，也就是启动了WSL的Docker容器。可以看到EasyConnect拨号界面，输出VPN地址、用户名、密码和验证码后，应该可以正常登录VPN，界面和Win11原生的GUI很像，但也带有明显的Linux GUI风格。下次再启动EayConnect，VPN地址和用户名还记得。</p>
+<p>拨号界面，和WIN11基本一致</p>
+<p>![[Docker安装EasyConnect做为代理服务器/IMG-20260407213007503.png]]</p>
+<p>拨号成功后，正常WIN11拨号成功后，会隐藏在任务栏中，而WSLg会在桌面上显示这个图标，应该是一个WSL窗口，在图标上按右键出现的菜单，就很有LINUX风格。</p>
+<p>![[Docker安装EasyConnect做为代理服务器/IMG-20260407213415766.png]]</p>
+<p>容器启动成功后，在Win11中暴露127.0.0.1:1080和127.0.0.1:8888两个端口，分别提供了 <code>Sock5</code> 和 <code>HTTPS</code> 代理服务，用来访问VPN内网。</p>
+<p>![[Docker安装EasyConnect做为代理服务器/IMG-20260407213554683.png]]</p>
+<h2 id="配置代理客户端"><a href="#配置代理客户端" class="headerlink" title="配置代理客户端"></a>配置代理客户端</h2><h3 id="edge浏览器"><a href="#edge浏览器" class="headerlink" title="edge浏览器"></a>edge浏览器</h3><p>安装插件 <code>Proxy SwitchyOmega</code> ，可以根据访问目的自动切换代理服务器。</p>
+<p>配置Proxy</p>
+<p>![[Docker安装EasyConnect做为代理服务器/IMG-20260407214001494.png]]</p>
+<p>配置切换规则</p>
+<p>![[Docker安装EasyConnect做为代理服务器/IMG-20260407213854789.png]]</p>
+<h3 id="天翼云桌面"><a href="#天翼云桌面" class="headerlink" title="天翼云桌面"></a>天翼云桌面</h3><p>使用场景比较复杂。有3个天翼云桌面，两个使用外网登录，一个使用内网专线地址登录。天翼云桌面配置中可以使用代理服务器，但这样一来，就要来回切换配置，不能同时访问内网和外网云桌面。</p>
+<h3 id="沙箱和系统代理配置"><a href="#沙箱和系统代理配置" class="headerlink" title="沙箱和系统代理配置"></a>沙箱和系统代理配置</h3><p>使用沙箱可以多开，配置也完成隔离，能解决上面的问题。</p>
+<ol>
+<li>在系统全局安装天翼云桌面和代理软件 <code>proxifier</code>，安装沙箱 <code>sandiboxie</code>。</li>
+<li>在沙箱中运行天翼云桌面，沙箱中的天翼云桌面使用内网专项地址登录，沙箱外的天翼云桌面使用外网登录，两者可以同时运行。</li>
+<li>在沙箱中运行 <code>proxifier</code>，配置天翼云桌面访问内网专线地址走代理服务器，其它访问直通不走代理，同时在沙箱中在高级配置-触发器中配置沙箱启动阶段即启动 <code>proxifier</code>。</li>
+</ol>
+<p>![[Docker安装EasyConnect做为代理服务器/IMG-20260407214140316.png]]</p>
+<h3 id="360浏览器"><a href="#360浏览器" class="headerlink" title="360浏览器"></a>360浏览器</h3><p>为了防止360污染全局系统，在沙箱中安装360浏览器。配置 <code>proxifier</code>，360浏览器进程全部走代理服务器。这样360浏览器在沙箱中运行，并且能访问内网。</p>
+<h2 id="日常操作"><a href="#日常操作" class="headerlink" title="日常操作"></a>日常操作</h2><ol>
+<li>启动<code>EasyConnect</code>，拨号。实际启动了<code>WSL</code>容器，拨入<code>VPN</code>，提供了 <code>SOCK5</code> 和 <code>HTTPS</code> 两个代理服务器。</li>
+<li>启动内网天翼云桌面。实际启动了沙箱，启动了Proxifier，并且内网天翼云桌面自动走代理访问内网。</li>
+<li>启动EDGE浏览器，可以直接访问内网系统，如OA等系统。最近OA升级，可以使用EDGE访问OA了。</li>
+<li>启动360浏览器，在沙箱中运行，可以访问内网。</li>
+</ol>
+<hr>
+<p>#日期/2026-03-29</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/EasyConnect%E3%80%81Docker%E3%80%81%E6%B2%99%E7%AE%B1%E3%80%81WSL2/" rel="tag"># EasyConnect、Docker、沙箱、WSL2</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/12/13/%E4%BD%BF%E7%94%A8%E8%B1%86%E5%8C%85%E5%81%9A%E4%BA%86%E4%B8%80%E4%B8%AAObsidian%E6%8F%92%E4%BB%B6/" rel="prev" title="使用豆包做了一个Obsidian插件">
+      <i class="fa fa-chevron-left"></i> 使用豆包做了一个Obsidian插件
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Docker%E5%AE%89%E8%A3%85EasyConnect%E5%81%9A%E4%B8%BA%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%90%8D"><span class="nav-number">1.</span> <span class="nav-text">Docker安装EasyConnect做为代理服务器名</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#WSL%E4%B8%AD%E5%AE%89%E8%A3%85Docker%E7%89%88%E6%9C%AC%E7%9A%84EasyConnect"><span class="nav-number">1.1.</span> <span class="nav-text">WSL中安装Docker版本的EasyConnect</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WSL%E9%85%8D%E7%BD%AE"><span class="nav-number">1.1.1.</span> <span class="nav-text">WSL配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8EasyConnect%E8%84%9A%E6%9C%AC"><span class="nav-number">1.1.2.</span> <span class="nav-text">启动EasyConnect脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E9%95%9C%E5%83%8F%E5%8F%AF%E5%9C%A8Win11%E4%B8%AD%E7%9B%B4%E6%8E%A5%E5%90%AF%E5%8A%A8"><span class="nav-number">1.1.3.</span> <span class="nav-text">配置镜像可在Win11中直接启动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8EasyConnect"><span class="nav-number">1.1.4.</span> <span class="nav-text">启动EasyConnect</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E4%BB%A3%E7%90%86%E5%AE%A2%E6%88%B7%E7%AB%AF"><span class="nav-number">1.2.</span> <span class="nav-text">配置代理客户端</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#edge%E6%B5%8F%E8%A7%88%E5%99%A8"><span class="nav-number">1.2.1.</span> <span class="nav-text">edge浏览器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%A9%E7%BF%BC%E4%BA%91%E6%A1%8C%E9%9D%A2"><span class="nav-number">1.2.2.</span> <span class="nav-text">天翼云桌面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B2%99%E7%AE%B1%E5%92%8C%E7%B3%BB%E7%BB%9F%E4%BB%A3%E7%90%86%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.3.</span> <span class="nav-text">沙箱和系统代理配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#360%E6%B5%8F%E8%A7%88%E5%99%A8"><span class="nav-number">1.2.4.</span> <span class="nav-text">360浏览器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%97%A5%E5%B8%B8%E6%93%8D%E4%BD%9C"><span class="nav-number">1.3.</span> <span class="nav-text">日常操作</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lyallchan</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">66</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">122</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lyallchan</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

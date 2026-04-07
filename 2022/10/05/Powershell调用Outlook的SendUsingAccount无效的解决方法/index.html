@@ -20,27 +20,24 @@
     var CONFIG = {"hostname":"lyallchan.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":false,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}}};
   </script>
 
-  <meta name="description" content="背景原来有个powershell脚本，供Totalcmd调用，可以将TC中选择的文件（列表）做为附件生成outlook邮件，并自动填写主题subject。这个程序一直运行的很好，后来又用ahk和python写了类似的脚本。 三个脚本中，powershell速度最慢，而且会有命令行窗口弹出，而ahk和python相对速度会快一点。">
+  <meta name="description" content="toc: true title: Powershell调用Outlook的SendUsingAccount无效的解决方法 date: 2019-11-09 08:51 tags: [Powershell, com, sendusingaccount] description:  背景原来有个powershell脚本，供Totalcmd调用，可以将TC中选择的文件（列表）做为附件生成outlook">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Powershell调用Outlook的SendUsingAccount无效的解决方法">
-<meta property="og:url" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:title" content="折腾手记">
+<meta property="og:url" content="http://lyallchan.github.io/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/index.html">
 <meta property="og:site_name" content="折腾手记">
-<meta property="og:description" content="背景原来有个powershell脚本，供Totalcmd调用，可以将TC中选择的文件（列表）做为附件生成outlook邮件，并自动填写主题subject。这个程序一直运行的很好，后来又用ahk和python写了类似的脚本。 三个脚本中，powershell速度最慢，而且会有命令行窗口弹出，而ahk和python相对速度会快一点。">
+<meta property="og:description" content="toc: true title: Powershell调用Outlook的SendUsingAccount无效的解决方法 date: 2019-11-09 08:51 tags: [Powershell, com, sendusingaccount] description:  背景原来有个powershell脚本，供Totalcmd调用，可以将TC中选择的文件（列表）做为附件生成outlook">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-08-51.png">
-<meta property="og:image" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-24-11.png">
-<meta property="og:image" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-47.png">
-<meta property="og:image" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-10.png">
-<meta property="article:published_time" content="2019-11-09T00:51:00.000Z">
-<meta property="article:modified_time" content="2024-11-16T14:23:10.046Z">
+<meta property="og:image" content="http://lyallchan.github.io/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-08-51.png">
+<meta property="og:image" content="http://lyallchan.github.io/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-24-11.png">
+<meta property="og:image" content="http://lyallchan.github.io/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-47.png">
+<meta property="og:image" content="http://lyallchan.github.io/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-10.png">
+<meta property="article:published_time" content="2022-10-05T03:17:37.631Z">
+<meta property="article:modified_time" content="2026-03-30T00:47:41.864Z">
 <meta property="article:author" content="lyallchan">
-<meta property="article:tag" content="Powershell">
-<meta property="article:tag" content="com">
-<meta property="article:tag" content="sendusingaccount">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-08-51.png">
+<meta name="twitter:image" content="http://lyallchan.github.io/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-08-51.png">
 
-<link rel="canonical" href="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/">
+<link rel="canonical" href="http://lyallchan.github.io/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/">
 
 
 <script id="page-configurations">
@@ -53,7 +50,7 @@
   };
 </script>
 
-  <title>Powershell调用Outlook的SendUsingAccount无效的解决方法 | 折腾手记</title>
+  <title> | 折腾手记</title>
   
 
 
@@ -164,7 +161,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/">
+    <link itemprop="mainEntityOfPage" href="http://lyallchan.github.io/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -177,7 +174,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Powershell调用Outlook的SendUsingAccount无效的解决方法
+          
         </h1>
 
         <div class="post-meta">
@@ -187,14 +184,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2019-11-09 08:51:00" itemprop="dateCreated datePublished" datetime="2019-11-09T08:51:00+08:00">2019-11-09</time>
+              <time title="创建时间：2022-10-05 11:17:37" itemprop="dateCreated datePublished" datetime="2022-10-05T11:17:37+08:00">2022-10-05</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-11-16 22:23:10" itemprop="dateModified" datetime="2024-11-16T22:23:10+08:00">2024-11-16</time>
+                <time title="修改时间：2026-03-30 08:47:41" itemprop="dateModified" datetime="2026-03-30T08:47:41+08:00">2026-03-30</time>
               </span>
 
           
@@ -209,6 +206,12 @@
 
       
         <hr>
+<p>toc: true</p>
+<p>title: Powershell调用Outlook的SendUsingAccount无效的解决方法</p>
+<p>date: 2019-11-09 08:51</p>
+<p>tags: [Powershell, com, sendusingaccount]</p>
+<p>description:</p>
+<hr>
 <h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>原来有个powershell脚本，供Totalcmd调用，可以将TC中选择的文件（列表）做为附件生成outlook邮件，并自动填写主题subject。这个程序一直运行的很好，后来又用ahk和python写了类似的脚本。</p>
 <p>三个脚本中，powershell速度最慢，而且会有命令行窗口弹出，而ahk和python相对速度会快一点。</p>
 <span id="more"></span>
@@ -227,22 +230,21 @@
 
 <p>但是ps和py用上面的方法始后，还是显示SendUsingAccount为空。</p>
 <p>如果我在outlook界面上修改发送账号，如下图，改变发件人，可以修改发送账号，SendUsingAccount会跟着改变，并且用上面的方法也可以修改SendUsingAccount的值。似乎在SendUsingAccount为空的情况下会赋值失败，直到SendUsingAccount有了初始值以后，才能正确赋值。</p>
-<img src="/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-08-51.png" class="">
+<img src="/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-08-51.png" class="">
 
 <p>这个兄弟的遭遇和我一摸一样</p>
-<img src="/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-24-11.png" class="">
-
+<img src="/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-24-11.png" class="">
 
 <p>我觉得这是Outlook一个BUG!!</p>
 <h1 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h1><p>经过艰难搜索，用了各种关键字，最终通过搜索python找到了一个帖子</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">https://social.msdn.microsoft.com/Forums/windows/en-US/7afc9e42-ca4f-491b-8c50-19556fb4e1cf/sendusingaccount-does-not-work-in-outlook-2010-possible-bug?forum=outlookdev</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>解决方法分别为。</p>
-<img src="/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-47.png" class="">
+<img src="/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-47.png" class="">
 
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">account = outlook.Session.Accounts.Item(<span class="string">&quot;designated.account@mailbox.com&quot;</span>)</span><br><span class="line">ma._oleobj_.Invoke(*(<span class="number">64209</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="number">0</span>, account))     <span class="comment"># ma.SendUsingAccount = account</span></span><br></pre></td></tr></table></figure>
 
-<img src="/2019/11/09/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-10.png" class="">
+<img src="/2022/10/05/Powershell%E8%B0%83%E7%94%A8Outlook%E7%9A%84SendUsingAccount%E6%97%A0%E6%95%88%E7%9A%84%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95/2019-11-09-13-22-10.png" class="">
 
 <figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$account</span> = <span class="variable">$outlook</span>.Session.Accounts.Item(<span class="string">&quot;designated.account@mailbox.com&quot;</span>)</span><br><span class="line"><span class="variable">$mail</span>.GetType().InvokeMember(<span class="string">&quot;SendUsingAccount&quot;</span>,<span class="string">&quot;SetProperty&quot;</span>,<span class="variable">$NULL</span>,<span class="variable">$mail</span>,<span class="variable">$account</span>)</span><br></pre></td></tr></table></figure>
 
@@ -256,11 +258,6 @@
     
 
       <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/Powershell/" rel="tag"># Powershell</a>
-              <a href="/tags/com/" rel="tag"># com</a>
-              <a href="/tags/sendusingaccount/" rel="tag"># sendusingaccount</a>
-          </div>
 
         
 
@@ -268,12 +265,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2019/04/16/Dynalist%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%87%AA%E5%AE%9A%E4%B9%89CSS/" rel="prev" title="Dynalist客户端自定义CSS">
-      <i class="fa fa-chevron-left"></i> Dynalist客户端自定义CSS
+    <a href="/2022/05/12/AHK%E7%83%AD%E9%94%AE%E6%8C%89%E9%94%AE%E6%AC%A1%E6%95%B0%E5%92%8C%E9%95%BF%E6%8C%89%E9%94%AE/" rel="prev" title="AHK热键按键次数和长按键">
+      <i class="fa fa-chevron-left"></i> AHK热键按键次数和长按键
     </a></div>
       <div class="post-nav-item">
-    <a href="/2020/01/05/%E7%94%A8PowerQuery%E5%88%B6%E4%BD%9C%E5%A4%9A%E8%A1%A8%E6%95%B0%E6%8D%AE%E9%80%8F%E8%A7%86%E8%A1%A8/" rel="next" title="用PowerQuery制作多表数据透视表">
-      用PowerQuery制作多表数据透视表 <i class="fa fa-chevron-right"></i>
+    <a href="/2022/10/05/%E5%BC%80%E6%9C%BA%E5%90%AF%E5%8A%A8WSL2%E7%9A%84SSHD%E6%9C%8D%E5%8A%A1/" rel="next" title="">
+       <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -347,12 +344,12 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">65</span>
+          <span class="site-state-item-count">66</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">126</span>
+        <span class="site-state-item-count">122</span>
         <span class="site-state-item-name">标签</span>
       </div>
   </nav>
@@ -379,7 +376,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2024</span>
+  <span itemprop="copyrightYear">2026</span>
   <span class="with-love">
     <i class="fa fa-fa fa-heart"></i>
   </span>
